@@ -17,8 +17,14 @@ for path in sorted((root / "exp").glob("*/log.csv")):
     )
     iteration = int(float(row["Iteration"])) + 1
     peak = max(float(r["Eval_AverageReturn"]) for r in rows)
+    label = (
+        path.parent.name.split("_sd")[0]
+        + " [seed "
+        + path.parent.name.split("_sd")[1].split("_")[0]
+        + "]"
+    )
     print(
-        f"{path.parent.name.split('_sd')[0]:52} {iteration:3}/{budget!s:3} "
+        f"{label:60} {iteration:3}/{budget!s:3} "
         f"eval={float(row['Eval_AverageReturn']):8.1f} peak={peak:8.1f} "
         f"steps={int(float(row['Train_EnvstepsSoFar'])):8,}"
     )

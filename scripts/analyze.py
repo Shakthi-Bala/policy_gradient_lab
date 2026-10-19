@@ -379,6 +379,30 @@ def results_markdown(runs):
         ]
     else:
         lines += ["No completed run has reached the 1,000-return target yet.", ""]
+    if successful:
+        earliest = min(successful, key=lambda run: run["first_threshold_steps"])
+        stable = max(pendulum, key=lambda run: run["last10_mean_eval_return"])
+        lines += [
+            (
+                f"The earliest-crossing run ended at {earliest['final_eval_return']:.1f}. "
+                f"The highest trailing-ten mean belonged to {stable['name']} "
+                f"({stable['last10_mean_eval_return']:.1f}), whose final evaluation was {stable['final_eval_return']:.1f}. "
+                "First threshold crossing and sustained performance are different criteria."
+            ),
+            "",
+        ]
+    if "pendulum_tuned" in lookup and "pendulum_tuned_fast" in lookup:
+        medium, fast = lookup["pendulum_tuned"], lookup["pendulum_tuned_fast"]
+        lines += [
+            (
+                f"The matched 1,000-step-batch candidates differ only in actor learning rate: "
+                f"0.01 first reached 1,000 at {medium['first_threshold_steps']} steps and ended at "
+                f"{medium['final_eval_return']:.1f}; 0.02 first reached it at {fast['first_threshold_steps']} "
+                f"steps and ended at {fast['final_eval_return']:.1f}. The larger rate accelerated "
+                "the initial crossing in this seed, while both candidates later lost performance."
+            ),
+            "",
+        ]
     lines += [
         (
             "Tuning reduces batches from 5,000 to 500 or 1,000 transitions to allow more "
