@@ -21,7 +21,10 @@ uv run python scripts/package_submission.py
 ```
 
 The runner launches independent processes, caps BLAS threads to one, and skips
-completed configurations. `--group cartpole`, `cheetah`, `lunar`, or `pendulum`
+completed configurations. Per-configuration file locks prevent duplicate jobs
+across overlapping runner invocations. If the orchestrator is restarted while a
+matching training process is still alive, it adopts that process and waits for
+its completed artifacts instead of starting over. `--group cartpole`, `cheetah`, `lunar`, or `pendulum`
 limits its scope. Console output is saved in ignored `artifacts/console/`; all
 metrics/configs/checkpoints needed for reproduction are versioned under `exp/`.
 The NumPy inference backend is specified in the generated commands, so it is

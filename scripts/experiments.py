@@ -148,7 +148,10 @@ def completed_directory(job):
         flags_file = directory / "flags.json"
         if not flags_file.exists() or not (directory / "log.csv").exists():
             continue
-        config = json.loads(flags_file.read_text())
+        try:
+            config = json.loads(flags_file.read_text())
+        except (json.JSONDecodeError, OSError):
+            continue
         with (directory / "log.csv").open() as handle:
             rows = list(csv.DictReader(handle))
         if rows and int(float(rows[-1]["Iteration"])) == config["n_iter"] - 1:
@@ -200,7 +203,12 @@ def run_locked_job(job, notify):
     returncode = 0
     if active is not None:
         print(f"ADOPT {name}: waiting for existing PID {active.pid}", flush=True)
-        while active.is_running() and active.status() != psutil.STATUS_ZOMBIE:
+        while True:
+            try:
+                if not active.is_running() or active.status() == psutil.STATUS_ZOMBIE:
+                    break
+            except psutil.NoSuchProcess:
+                break
             time.sleep(2)
     else:
         with (log_dir / f"{name}.log").open("w") as handle:
