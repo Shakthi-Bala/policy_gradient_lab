@@ -87,3 +87,8 @@ The five incomplete unoptimized LunarLander runs were archived under ignored
 all prescribed learning hyperparameters unchanged. No completed LunarLander runs
 were discarded. Reported runs use the explicit cleanup flag; the default training
 CLI continues to use unmodified Gym unless the flag is supplied.
+
+After restarting with particle cleanup, all recorded metrics except elapsed time
+also matched **exactly across the first ten training iterations of every one of
+the five λ settings**. This checks the complete policy/critic training path, not
+just environment traces. Summary: [`lunar_prefix_equivalence.json`](lunar_prefix_equivalence.json).

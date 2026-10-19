@@ -1,0 +1,31 @@
+{
+  "iterations_per_setting": 10,
+  "excluded_metric": "TimeSinceStart",
+  "settings": [
+    {
+      "lambda": "0",
+      "metrics": 15,
+      "all_values_exactly_equal": true
+    },
+    {
+      "lambda": "0.95",
+      "metrics": 15,
+      "all_values_exactly_equal": true
+    },
+    {
+      "lambda": "0.98",
+      "metrics": 15,
+      "all_values_exactly_equal": true
+    },
+    {
+      "lambda": "0.99",
+      "metrics": 15,
+      "all_values_exactly_equal": true
+    },
+    {
+      "lambda": "1",
+      "metrics": 15,
+      "all_values_exactly_equal": true
+    }
+  ]
+}
