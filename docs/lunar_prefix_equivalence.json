@@ -1,30 +1,35 @@
 {
-  "iterations_per_setting": 10,
   "excluded_metric": "TimeSinceStart",
+  "total_training_iterations_compared": 437,
   "settings": [
     {
       "lambda": "0",
-      "metrics": 15,
+      "iterations_compared": 116,
+      "metrics_per_iteration": 15,
       "all_values_exactly_equal": true
     },
     {
       "lambda": "0.95",
-      "metrics": 15,
+      "iterations_compared": 87,
+      "metrics_per_iteration": 15,
       "all_values_exactly_equal": true
     },
     {
       "lambda": "0.98",
-      "metrics": 15,
+      "iterations_compared": 91,
+      "metrics_per_iteration": 15,
       "all_values_exactly_equal": true
     },
     {
       "lambda": "0.99",
-      "metrics": 15,
+      "iterations_compared": 95,
+      "metrics_per_iteration": 15,
       "all_values_exactly_equal": true
     },
     {
       "lambda": "1",
-      "metrics": 15,
+      "iterations_compared": 48,
+      "metrics_per_iteration": 15,
       "all_values_exactly_equal": true
     }
   ]
