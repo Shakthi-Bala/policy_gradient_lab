@@ -221,7 +221,8 @@ def results_markdown(runs):
             "but introduces finite-batch bias. Compare normalized and unnormalized rows above rather "
             "than assuming it always helps. Batch size trades gradient noise against interaction cost: "
             "100 iterations at 4,000 steps use roughly four times the data of 1,000-step batches. "
-            "The charts compare actual training steps, not iteration counts."
+            "The charts compare actual training steps, not iteration counts. CartPole plots show "
+            "training-batch average return, as in the assignment; the comparison table uses evaluation return."
         ),
         "",
         "![Small-batch CartPole](../media/cartpole_small.png)",
@@ -402,16 +403,6 @@ def make_pdf(markdown, plots):
     with PdfPages(DOCS / "report.pdf") as pdf:
         # Keep the written analysis readable and include the complete result table separately.
         text = markdown.split("## 1.")[1:]
-        overview = [
-            "Policy Gradient Lab — Experiment Report",
-            "",
-            "Berkeley CS285 Spring 2026 · Assignment 2",
-            "",
-            "REINFORCE, reward-to-go, learned value baselines, GAE and sample efficiency.",
-            "",
-            "All metrics are computed from saved run CSVs. Primary comparisons use seed 1.",
-            "See docs/RESULTS.md for clickable raw logs, exact flags, and full discussion.",
-        ]
 
         def text_pages(lines):
             wrapped = []
@@ -433,8 +424,88 @@ def make_pdf(markdown, plots):
                 pdf.savefig(fig)
                 plt.close(fig)
 
-        text_pages(overview)
         runs = load_runs()
+        fig = plt.figure(figsize=(8.27, 11.69), facecolor="#f8fafc")
+        fig.text(
+            0.08,
+            0.92,
+            "POLICY\nGRADIENT LAB",
+            fontsize=34,
+            fontweight="bold",
+            color="#0f172a",
+            va="top",
+        )
+        fig.text(
+            0.08,
+            0.78,
+            "REINFORCE · value baselines · GAE",
+            fontsize=15,
+            color="#2563eb",
+        )
+        fig.text(
+            0.08,
+            0.74,
+            "A reproducible study of variance reduction and sample efficiency",
+            fontsize=11,
+            color="#475569",
+        )
+        fig.text(
+            0.08,
+            0.68,
+            f"{len(runs)} completed runs  /  4 environments  /  primary training seed: 1",
+            fontsize=12,
+            color="#0f172a",
+        )
+        for i, environment in enumerate(
+            ["CartPole-v0", "HalfCheetah-v4", "LunarLander-v2", "InvertedPendulum-v4"]
+        ):
+            group = [run for run in runs if run["environment"] == environment]
+            y = 0.59 - i * 0.105
+            fig.text(
+                0.08, y, environment, fontsize=14, fontweight="bold", color="#0f172a"
+            )
+            if group:
+                best = max(group, key=lambda run: run["peak_eval_return"])
+                fig.text(
+                    0.08,
+                    y - 0.029,
+                    f"Best evaluation-batch return: {best['peak_eval_return']:,.1f}",
+                    fontsize=11,
+                    color="#059669",
+                )
+                fig.text(
+                    0.08,
+                    y - 0.051,
+                    f"Configuration: {best['name']} · training seed {best['seed']}",
+                    fontsize=9,
+                    color="#475569",
+                )
+            else:
+                fig.text(
+                    0.08,
+                    y - 0.029,
+                    "No completed measurements yet",
+                    fontsize=11,
+                    color="#475569",
+                )
+        fig.text(
+            0.08,
+            0.13,
+            "Peaks are descriptive single-batch observations, not confidence estimates.\nFinal returns, trailing means, raw logs and limitations appear inside.",
+            fontsize=10,
+            color="#475569",
+            linespacing=1.6,
+        )
+        fig.text(
+            0.08,
+            0.065,
+            "Based on Berkeley CS285 Spring 2026 Homework 2\nGenerated directly from versioned experiment CSVs.",
+            fontsize=9,
+            color="#64748b",
+            linespacing=1.6,
+        )
+        pdf.savefig(fig)
+        plt.close(fig)
         text_pages(
             [
                 "Measured evaluation returns (seed 1)",
