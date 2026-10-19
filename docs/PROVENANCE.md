@@ -44,3 +44,21 @@ media export, notifications, and documentation extend the starter.
 
 No empirical threshold is considered achieved until verified from a completed
 run's CSV. Generated charts and results are derived from those CSVs.
+
+## CPU rollout inference
+
+The reproducible experiment matrix explicitly selects `--rollout_backend numpy`.
+For each single-observation action query, this backend evaluates the same frozen
+float32 tanh MLP weights with NumPy, then samples the categorical or diagonal
+Gaussian distribution with NumPy's seeded RNG. Parameter-version counters refresh
+cached weights after every optimizer update or checkpoint load. Tests compare
+network outputs and distribution parameters to PyTorch and verify categorical
+sample frequencies. All gradient calculations and optimization still use PyTorch.
+The default CLI backend remains `torch`; different backends have different random
+streams, so a seed does not imply identical trajectories across backends.
+
+A short initial PyTorch-backend throughput pilot was stopped before completion
+when the host's one-core CPU quota became apparent. Its partial logs are retained
+locally under ignored `artifacts/pilot_torch/`; those partial runs are excluded
+from experimental comparisons. All reported runs use the explicitly recorded
+NumPy backend with `OPENBLAS_NUM_THREADS=1` (set by the experiment runner).

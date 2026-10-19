@@ -113,3 +113,43 @@ def test_time_limit_and_sampling_budget():
 def test_gae_requires_baseline():
     with pytest.raises(ValueError, match="GAE requires"):
         make_agent(gae_lambda=0.95)
+
+
+@pytest.mark.parametrize("discrete", [True, False])
+def test_numpy_rollout_matches_torch_parameters_and_invalidates_cache(discrete):
+    torch.manual_seed(17)
+    policy = MLPPolicyPG(3, 2, discrete, 2, 16, 0.01)
+    obs = np.array([0.4, -0.7], dtype=np.float32)
+    output, std = policy._numpy_distribution_parameters(obs)
+    with torch.no_grad():
+        net = policy.logits_net if discrete else policy.mean_net
+        expected = net(torch.tensor(obs)).numpy()
+    np.testing.assert_allclose(output, expected, atol=2e-7)
+    if not discrete:
+        np.testing.assert_allclose(std, policy.logstd.detach().exp().numpy())
+    policy.rollout_backend = "numpy"
+    assert policy.get_action(obs).shape == (() if discrete else (3,))
+    batch_obs = np.repeat(obs[None], 4, axis=0)
+    actions = (
+        np.zeros(4, dtype=np.float32)
+        if discrete
+        else np.zeros((4, 3), dtype=np.float32)
+    )
+    policy.update(batch_obs, actions, np.ones(4, dtype=np.float32))
+    updated, _ = policy._numpy_distribution_parameters(obs)
+    with torch.no_grad():
+        expected_updated = net(torch.tensor(obs)).numpy()
+    assert not np.allclose(output, updated)
+    np.testing.assert_allclose(updated, expected_updated, atol=2e-7)
+
+
+def test_numpy_categorical_sampling_matches_distribution():
+    torch.manual_seed(17)
+    np.random.seed(17)
+    policy = MLPPolicyPG(3, 2, True, 1, 8, 0.01)
+    policy.rollout_backend = "numpy"
+    obs = np.zeros(2, dtype=np.float32)
+    expected = policy(torch.tensor(obs)).probs.detach().numpy()
+    samples = np.array([policy.get_action(obs) for _ in range(4000)])
+    observed = np.bincount(samples, minlength=3) / len(samples)
+    np.testing.assert_allclose(observed, expected, atol=0.03)

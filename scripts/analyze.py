@@ -131,9 +131,11 @@ def results_markdown(runs):
         "",
         "Generated from completed run CSVs by `uv run python scripts/analyze.py`.",
         "",
-        "All primary ablations use **seed 1**. Peak return is the best single evaluation batch; "
-        "final and trailing-ten means are also reported to expose instability. Evaluation samples "
-        "are stochastic and limited; these are not confidence intervals or multi-seed guarantees.",
+        (
+            "All primary ablations use **seed 1**. Peak return is the best single evaluation batch; "
+            "final and trailing-ten means are also reported to expose instability. Evaluation samples "
+            "are stochastic and limited; these are not confidence intervals or multi-seed guarantees."
+        ),
         "",
         "| Experiment | Peak eval | Final eval | Last 10 mean | Training steps | First target steps |",
         "|---|---:|---:|---:|---:|---:|",
@@ -173,23 +175,29 @@ def results_markdown(runs):
                 "Small batch (1,000)" if prefix == "cartpole" else "Large batch (4,000)"
             )
             lines += [
-                f"**{label}.** Last-ten mean evaluation returns: trajectory {a['last10_mean_eval_return']:.1f}, "
-                f"reward-to-go {b['last10_mean_eval_return']:.1f}, normalized trajectory "
-                f"{c['last10_mean_eval_return']:.1f}, normalized reward-to-go {d['last10_mean_eval_return']:.1f}. "
-                f"Without normalization, {'reward-to-go' if b['last10_mean_eval_return'] > a['last10_mean_eval_return'] else 'trajectory returns'} "
-                "performed better by this endpoint metric.",
+                (
+                    f"**{label}.** Last-ten mean evaluation returns: trajectory {a['last10_mean_eval_return']:.1f}, "
+                    f"reward-to-go {b['last10_mean_eval_return']:.1f}, normalized trajectory "
+                    f"{c['last10_mean_eval_return']:.1f}, normalized reward-to-go {d['last10_mean_eval_return']:.1f}. "
+                    f"Without normalization, {'reward-to-go' if b['last10_mean_eval_return'] > a['last10_mean_eval_return'] else 'trajectory returns'} "
+                    "performed better by this endpoint metric."
+                ),
                 "",
             ]
     lines += [
-        "Reward-to-go is generally preferred because an action cannot influence past rewards. "
-        "Removing those past terms preserves the expected score-function gradient while usually "
-        "reducing its variance. Relative discounting weights future rewards from each decision.",
+        (
+            "Reward-to-go is generally preferred because an action cannot influence past rewards. "
+            "Removing those past terms preserves the expected score-function gradient while usually "
+            "reducing its variance. Relative discounting weights future rewards from each decision."
+        ),
         "",
-        "Normalization rescales the update and subtracts a batch mean; it is a useful heuristic "
-        "but introduces finite-batch bias. Compare normalized and unnormalized rows above rather "
-        "than assuming it always helps. Batch size trades gradient noise against interaction cost: "
-        "100 iterations at 4,000 steps use roughly four times the data of 1,000-step batches. "
-        "The charts compare actual training steps, not iteration counts.",
+        (
+            "Normalization rescales the update and subtracts a batch mean; it is a useful heuristic "
+            "but introduces finite-batch bias. Compare normalized and unnormalized rows above rather "
+            "than assuming it always helps. Batch size trades gradient noise against interaction cost: "
+            "100 iterations at 4,000 steps use roughly four times the data of 1,000-step batches. "
+            "The charts compare actual training steps, not iteration counts."
+        ),
         "",
         "![Small-batch CartPole](../media/cartpole_small.png)",
         "",
@@ -209,11 +217,13 @@ def results_markdown(runs):
                 )
             lines += [sentence, ""]
     lines += [
-        "The one-gradient-step ablation keeps the baseline learning rate at 0.01 and "
-        "reduces value updates from five to one. This slows fitting to the current batch; "
-        "policy outcomes above show whether that change helped this seed. Value targets "
-        "change with the policy, so training MSE need not decrease monotonically, and lower "
-        "training MSE alone does not prove better control. The baseline uses raw targets.",
+        (
+            "The one-gradient-step ablation keeps the baseline learning rate at 0.01 and "
+            "reduces value updates from five to one. This slows fitting to the current batch; "
+            "policy outcomes above show whether that change helped this seed. Value targets "
+            "change with the policy, so training MSE need not decrease monotonically, and lower "
+            "training MSE alone does not prove better control. The baseline uses raw targets."
+        ),
         "",
         "![HalfCheetah return](../media/cheetah_returns.png)",
         "",
@@ -227,20 +237,26 @@ def results_markdown(runs):
         best = max(lunar, key=lambda r: r["peak_eval_return"])
         stable = max(lunar, key=lambda r: r["last10_mean_eval_return"])
         lines += [
-            f"Best peak: **{best['name']}**, {best['peak_eval_return']:.1f}. Best trailing-ten "
-            f"mean: **{stable['name']}**, {stable['last10_mean_eval_return']:.1f}.",
+            (
+                f"Best peak: **{best['name']}**, {best['peak_eval_return']:.1f}. Best trailing-ten "
+                f"mean: **{stable['name']}**, {stable['last10_mean_eval_return']:.1f}."
+            ),
             "",
         ]
     lines += [
-        "λ=0 uses one-step TD residuals, reducing variance while depending heavily on value "
-        "accuracy. λ=1 telescopes to Monte Carlo reward-to-go minus the baseline under the "
-        "zero-tail boundary convention, reducing bootstrap bias while increasing variance. "
-        "Intermediate λ mixes horizons. The observed ranking above and curves below reflect "
-        "this seed, not a universal monotonic relationship. All five runs retain the PDF’s "
-        "fixed batch size, learning rate, architecture, discount, and iteration budget.",
+        (
+            "λ=0 uses one-step TD residuals, reducing variance while depending heavily on value "
+            "accuracy. λ=1 telescopes to Monte Carlo reward-to-go minus the baseline under the "
+            "zero-tail boundary convention, reducing bootstrap bias while increasing variance. "
+            "Intermediate λ mixes horizons. The observed ranking above and curves below reflect "
+            "this seed, not a universal monotonic relationship. All five runs retain the PDF’s "
+            "fixed batch size, learning rate, architecture, discount, and iteration budget."
+        ),
         "",
-        "The official starter uses standard LunarLander-v2 without an additional action-noise "
-        "wrapper; this protocol is preserved. See [PROVENANCE.md](PROVENANCE.md).",
+        (
+            "The official starter uses standard LunarLander-v2 without an additional action-noise "
+            "wrapper; this protocol is preserved. See [PROVENANCE.md](PROVENANCE.md)."
+        ),
         "",
         "![GAE comparison](../media/lunar_gae.png)",
         "",
@@ -252,9 +268,11 @@ def results_markdown(runs):
     if successful:
         best = min(successful, key=lambda r: r["first_threshold_steps"])
         lines += [
-            f"Earliest observed 1,000-return evaluation: **{best['name']}**, at "
-            f"**{best['first_threshold_steps']:,} training steps**. "
-            f"The below-100K target {'was met' if best['first_threshold_steps'] < 100000 else 'was not met'}.",
+            (
+                f"Earliest observed 1,000-return evaluation: **{best['name']}**, at "
+                f"**{best['first_threshold_steps']:,} training steps**. "
+                f"The below-100K target {'was met' if best['first_threshold_steps'] < 100000 else 'was not met'}."
+            ),
             "",
             "```json",
             json.dumps(
@@ -281,25 +299,31 @@ def results_markdown(runs):
     else:
         lines += ["No completed run has reached the 1,000-return target yet.", ""]
     lines += [
-        "Tuning reduces batches from 5,000 to 500 or 1,000 transitions to allow more "
-        "frequent policy updates per interaction budget, and combines reward-to-go, "
-        "normalization, a value baseline, γ=0.99 and GAE. The candidates also vary learning "
-        "rate and λ. These coupled changes are a configuration search, not a controlled "
-        "causal attribution of gains to any one hyperparameter. All attempts are retained.",
+        (
+            "Tuning reduces batches from 5,000 to 500 or 1,000 transitions to allow more "
+            "frequent policy updates per interaction budget, and combines reward-to-go, "
+            "normalization, a value baseline, γ=0.99 and GAE. The candidates also vary learning "
+            "rate and λ. These coupled changes are a configuration search, not a controlled "
+            "causal attribution of gains to any one hyperparameter. All attempts are retained."
+        ),
         "",
         "![Pendulum sample efficiency](../media/pendulum_efficiency.png)",
         "",
         "## Reproduction and limitations",
         "",
-        "Exact command lines are in [commands.sh](commands.sh); per-run flags and source "
-        "revision are beside each CSV. The eight CartPole, three HalfCheetah, five LunarLander, "
-        "and four InvertedPendulum configurations are generated by `scripts/experiments.py`.",
+        (
+            "Exact command lines are in [commands.sh](commands.sh); per-run flags and source "
+            "revision are beside each CSV. The eight CartPole, three HalfCheetah, five LunarLander, "
+            "and four InvertedPendulum configurations are generated by `scripts/experiments.py`."
+        ),
         "",
-        "Single-seed comparisons and peak selection can be optimistic. A larger study should "
-        "repeat every setting over independent seeds and evaluate saved policies over many "
-        "held-out episodes. Training steps exclude evaluation interactions as required by the "
-        "assignment. Time-limit tails are zero, not bootstrapped. Videos show individual rollouts "
-        "of final checkpoints and do not establish average performance.",
+        (
+            "Single-seed comparisons and peak selection can be optimistic. A larger study should "
+            "repeat every setting over independent seeds and evaluate saved policies over many "
+            "held-out episodes. Training steps exclude evaluation interactions as required by the "
+            "assignment. Time-limit tails are zero, not bootstrapped. Videos show individual rollouts "
+            "of final checkpoints and do not establish average performance."
+        ),
         "",
     ]
     return "\n".join(lines)

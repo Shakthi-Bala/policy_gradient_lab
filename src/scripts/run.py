@@ -62,6 +62,8 @@ def run_training_loop(logger, args):
         gae_lambda=args.gae_lambda,
     )
 
+    agent.actor.rollout_backend = args.rollout_backend
+
     total_envsteps = 0
     start_time = time.time()
 
@@ -162,6 +164,9 @@ def setup_arguments(args=None):
 
     parser.add_argument(
         "--wandb_mode", choices=["disabled", "offline", "online"], default="disabled"
+    )
+    parser.add_argument(
+        "--rollout_backend", choices=["torch", "numpy"], default="torch"
     )
     parser.add_argument("--torch_threads", type=int, default=1)
     parser.add_argument("--checkpoint_freq", type=int, default=10)

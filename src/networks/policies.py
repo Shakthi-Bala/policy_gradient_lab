@@ -22,6 +22,8 @@ class MLPPolicy(nn.Module):
     ):
         super().__init__()
         self.discrete = discrete
+        self.rollout_backend = "torch"
+        self._numpy_cache = None
         network = ptu.build_mlp(ob_dim, ac_dim, n_layers, layer_size)
         if discrete:
             self.logits_net = network
@@ -34,9 +36,51 @@ class MLPPolicy(nn.Module):
 
     @torch.no_grad()
     def get_action(self, obs: np.ndarray) -> np.ndarray:
+        if self.rollout_backend == "numpy":
+            output, std = self._numpy_distribution_parameters(obs)
+            if self.discrete:
+                probabilities = np.exp(output - output.max())
+                probabilities /= probabilities.sum()
+                action = min(
+                    int(np.searchsorted(np.cumsum(probabilities), np.random.random())),
+                    len(output) - 1,
+                )
+                return np.asarray(action)
+            return np.asarray(np.random.normal(output, std), dtype=np.float32)
         return ptu.to_numpy(
             self(ptu.from_numpy(np.asarray(obs, dtype=np.float32))).sample()
         )
+
+    def _numpy_distribution_parameters(self, obs):
+        """Equivalent CPU inference for tiny, single-observation tanh MLPs.
+
+        Autograd still handles all training. Parameter version counters invalidate
+        cached copies after optimization or loading a different checkpoint.
+        """
+        version = tuple(parameter._version for parameter in self.parameters())
+        if self._numpy_cache is None or self._numpy_cache[0] != version:
+            network = self.logits_net if self.discrete else self.mean_net
+            layers = [
+                (
+                    layer.weight.detach().cpu().numpy().copy(),
+                    layer.bias.detach().cpu().numpy().copy(),
+                )
+                for layer in network
+                if isinstance(layer, nn.Linear)
+            ]
+            std = (
+                None
+                if self.discrete
+                else self.logstd.detach().cpu().exp().numpy().copy()
+            )
+            self._numpy_cache = (version, layers, std)
+        _, layers, std = self._numpy_cache
+        output = np.asarray(obs, dtype=np.float32)
+        for i, (weight, bias) in enumerate(layers):
+            output = weight @ output + bias
+            if i < len(layers) - 1:
+                output = np.tanh(output)
+        return output, std
 
     def forward(self, obs: torch.Tensor) -> D.Distribution:
         if self.discrete:

@@ -129,7 +129,13 @@ def experiments():
             }
         )
     for job in jobs:
-        job["args"] += ["--exp_name", job["name"], "--no_gpu"]
+        job["args"] += [
+            "--exp_name",
+            job["name"],
+            "--no_gpu",
+            "--rollout_backend",
+            "numpy",
+        ]
     return jobs
 
 
