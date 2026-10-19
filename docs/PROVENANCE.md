@@ -47,7 +47,11 @@ run's CSV. Generated charts and results are derived from those CSVs.
 
 ## CPU rollout inference
 
-The reproducible experiment matrix explicitly selects `--rollout_backend numpy`.
+The primary reproducible experiment matrix explicitly selects
+`--rollout_backend numpy`. One additional HalfCheetah reference run explicitly
+uses `--rollout_backend torch` with the seed-1 baseline learning hyperparameters
+unchanged; it tests the original sampler after the three NumPy seeds missed the
+final-return target.
 For each single-observation action query, this backend evaluates the same frozen
 float32 tanh MLP weights with NumPy, then samples the categorical or diagonal
 Gaussian distribution with NumPy's seeded RNG. Parameter-version counters refresh

@@ -156,6 +156,12 @@ def experiments():
     jobs.append(
         {"group": "cheetah", "name": "cheetah_baseline_na", "args": normalized_args}
     )
+    reference_args = baseline["args"].copy()
+    reference_args[reference_args.index("--exp_name") + 1] = "cheetah_baseline_torch"
+    reference_args[reference_args.index("--rollout_backend") + 1] = "torch"
+    jobs.append(
+        {"group": "cheetah", "name": "cheetah_baseline_torch", "args": reference_args}
+    )
     return jobs
 
 
