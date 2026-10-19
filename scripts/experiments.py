@@ -212,6 +212,8 @@ def main():
     args = parser.parse_args()
     jobs = [j for j in experiments() if args.group == "all" or j["group"] == args.group]
     if args.list:
+        print("# Generated exact benchmark commands; run from the repository root.")
+        print("export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1")
         for job in jobs:
             print(shlex.join(["uv", "run", "src/scripts/run.py", *job["args"]]))
         return

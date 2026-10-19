@@ -186,6 +186,29 @@ def results_markdown(runs):
                 ),
                 "",
             ]
+            for estimator, plain, normalized in [
+                ("trajectory", a, c),
+                ("reward-to-go", b, d),
+            ]:
+                difference = (
+                    normalized["last10_mean_eval_return"]
+                    - plain["last10_mean_eval_return"]
+                )
+                lines += [
+                    f"Normalization changed the {estimator} last-ten evaluation mean by {difference:+.1f} points.",
+                    "",
+                ]
+    if "cartpole_rtg_na" in lookup and "cartpole_lb_rtg_na" in lookup:
+        small, large = lookup["cartpole_rtg_na"], lookup["cartpole_lb_rtg_na"]
+        lines += [
+            (
+                f"With normalized reward-to-go, increasing the batch changed the last-ten mean from "
+                f"{small['last10_mean_eval_return']:.1f} to {large['last10_mean_eval_return']:.1f}. "
+                f"The first 200-return evaluations occurred at {small['first_threshold_steps']} and "
+                f"{large['first_threshold_steps']} training steps respectively (None means never reached)."
+            ),
+            "",
+        ]
     lines += [
         (
             "Reward-to-go is generally preferred because an action cannot influence past rewards. "
@@ -218,6 +241,24 @@ def results_markdown(runs):
                     f"{run['rows'][0]['Baseline Loss']:.1f} to {run['rows'][-1]['Baseline Loss']:.1f}."
                 )
             lines += [sentence, ""]
+    if all(
+        name in lookup
+        for name in ("cheetah", "cheetah_baseline", "cheetah_baseline_bgs1")
+    ):
+        plain, baseline, fewer = [
+            lookup[name]
+            for name in ("cheetah", "cheetah_baseline", "cheetah_baseline_bgs1")
+        ]
+        lines += [
+            (
+                f"Adding a baseline changed the last-ten evaluation mean from {plain['last10_mean_eval_return']:.1f} "
+                f"to {baseline['last10_mean_eval_return']:.1f}. Reducing its updates to one changed that mean "
+                f"to {fewer['last10_mean_eval_return']:.1f}; final training-batch baseline MSE was "
+                f"{baseline['rows'][-1]['Baseline Loss']:.1f} with five updates and "
+                f"{fewer['rows'][-1]['Baseline Loss']:.1f} with one."
+            ),
+            "",
+        ]
     lines += [
         (
             "The one-gradient-step ablation keeps the baseline learning rate at 0.01 and "
@@ -328,6 +369,32 @@ def results_markdown(runs):
         ),
         "",
     ]
+    evaluations = (
+        sorted((DOCS / "evaluation").glob("*.json"))
+        if (DOCS / "evaluation").exists()
+        else []
+    )
+    if evaluations:
+        lines += [
+            "## Fresh-episode evaluation of selected final checkpoints",
+            "",
+            (
+                "Configurations are selected from the benchmark comparisons. Each frozen final policy is "
+                "then evaluated stochastically on 30 new, individually seeded episodes. These bootstrap "
+                "intervals measure episode variation for one trained policy, not training-seed uncertainty."
+            ),
+            "",
+            "| Selected policy | Episodes | Mean return | Standard deviation | Bootstrap 95% CI |",
+            "|---|---:|---:|---:|---| ",
+        ]
+        for path in evaluations:
+            result = json.loads(path.read_text())
+            low, high = result["mean_return_bootstrap_95ci"]
+            lines.append(
+                f"| [{result['experiment']}](evaluation/{path.name}) | {result['episodes']} | "
+                f"{result['mean_return']:.1f} | {result['std_return']:.1f} | [{low:.1f}, {high:.1f}] |"
+            )
+        lines += [""]
     return "\n".join(lines)
 
 

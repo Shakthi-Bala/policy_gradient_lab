@@ -1,3 +1,5 @@
+# Generated exact benchmark commands; run from the repository root.
+export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1
 uv run src/scripts/run.py --env_name CartPole-v0 -n 100 -b 1000 --exp_name cartpole --no_gpu --rollout_backend numpy
 uv run src/scripts/run.py --env_name CartPole-v0 -n 100 -b 1000 -rtg --exp_name cartpole_rtg --no_gpu --rollout_backend numpy
 uv run src/scripts/run.py --env_name CartPole-v0 -n 100 -b 1000 -na --exp_name cartpole_na --no_gpu --rollout_backend numpy
