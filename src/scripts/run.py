@@ -20,13 +20,11 @@ MAX_NVIDEO = 2
 
 
 def run_training_loop(logger, args):
-    # set random seeds
     torch.set_num_threads(args.torch_threads)
     np.random.seed(args.seed)
     torch.manual_seed(args.seed)
     ptu.init_gpu(use_gpu=not args.no_gpu, gpu_id=args.which_gpu)
 
-    # make the gym environment
     env = make_env(
         args.env_name,
         prune_lunar_particles=args.prune_lunar_particles,
@@ -35,7 +33,7 @@ def run_training_loop(logger, args):
     )
     env.reset(seed=args.seed)
     env.action_space.seed(args.seed)
-    # Evaluation uses a separate RNG stream and never changes training observations.
+    # Keep evaluation resets and simulator RNG separate from training.
     eval_env = make_env(
         args.env_name,
         prune_lunar_particles=args.prune_lunar_particles,
@@ -50,13 +48,11 @@ def run_training_loop(logger, args):
     ob_dim = env.observation_space.shape[0]
     ac_dim = env.action_space.n if discrete else env.action_space.shape[0]
 
-    # simulation timestep, will be used for video saving
     if hasattr(env, "model"):
         fps = 1 / env.dt
     else:
         fps = env.env.metadata["render_fps"]
 
-    # initialize agent
     agent = PGAgent(
         ob_dim,
         ac_dim,
@@ -80,14 +76,11 @@ def run_training_loop(logger, args):
 
     for itr in range(args.n_iter):
         print(f"\n********** Iteration {itr} ************")
-        # make sure to use `max_ep_len`
         trajs, envsteps_this_batch = utils.sample_trajectories(
             env, agent.actor, args.batch_size, max_ep_len
         )
         total_envsteps += envsteps_this_batch
 
-        # trajs should be a list of dictionaries of NumPy arrays, where each dictionary corresponds to a trajectory.
-        # this line converts this into a single dictionary of lists of NumPy arrays.
         trajs_dict = {k: [traj[k] for traj in trajs] for k in trajs[0]}
 
         train_info = agent.update(
@@ -98,20 +91,17 @@ def run_training_loop(logger, args):
         )
 
         if itr % args.scalar_log_freq == 0 or itr == args.n_iter - 1:
-            # save eval metrics
             print("\nCollecting data for eval...")
             eval_trajs, _eval_envsteps_this_batch = utils.sample_trajectories(
                 eval_env, agent.actor, args.eval_batch_size, max_ep_len
             )
 
             logs = utils.compute_metrics(trajs, eval_trajs)
-            # compute additional metrics
             logs.update(train_info)
             logs["Train_EnvstepsSoFar"] = total_envsteps
             logs["TimeSinceStart"] = time.time() - start_time
             logs["Iteration"] = itr
 
-            # perform the logging
             for key, value in logs.items():
                 print(f"{key} : {value}")
             logger.log(logs, itr)
@@ -153,11 +143,19 @@ def setup_arguments(args=None):
     parser.add_argument("--gae_lambda", type=float, default=None)
     parser.add_argument("--normalize_advantages", "-na", action="store_true")
     parser.add_argument(
-        "--batch_size", "-b", type=int, default=1000
-    )  # steps collected per train iteration
+        "--batch_size",
+        "-b",
+        type=int,
+        default=1000,
+        help="Minimum training transitions per iteration (episodes finish in full)",
+    )
     parser.add_argument(
-        "--eval_batch_size", "-eb", type=int, default=400
-    )  # steps collected per eval iteration
+        "--eval_batch_size",
+        "-eb",
+        type=int,
+        default=400,
+        help="Minimum evaluation transitions per logged iteration",
+    )
 
     parser.add_argument("--discount", type=float, default=1.0)
     parser.add_argument("--learning_rate", "-lr", type=float, default=5e-3)
@@ -165,8 +163,10 @@ def setup_arguments(args=None):
     parser.add_argument("--layer_size", "-s", type=int, default=64)
 
     parser.add_argument(
-        "--ep_len", type=int
-    )  # students shouldn't change this away from env's default
+        "--ep_len",
+        type=int,
+        help="Episode step limit; defaults to the environment limit",
+    )
     parser.add_argument("--seed", type=int, default=1)
     parser.add_argument("--no_gpu", "-ngpu", action="store_true")
     parser.add_argument("--which_gpu", "-gpu_id", default=0)
@@ -198,7 +198,6 @@ def setup_arguments(args=None):
 
 
 def main(args):
-    # Create directory for logging
     logdir_prefix = "exp"  # Keep for autograder
 
     exp_name = f"{args.env_name}_{args.exp_name}_sd{args.seed}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"

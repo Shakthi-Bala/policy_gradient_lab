@@ -6,9 +6,6 @@ from PIL import Image
 
 from networks.policies import MLPPolicy
 
-############################################
-############################################
-
 
 def sample_trajectory(
     env: gym.Env, policy: MLPPolicy, max_length: int, render: bool = False
@@ -19,7 +16,6 @@ def sample_trajectory(
     obs, acs, rewards, next_obs, terminals, image_obs = [], [], [], [], [], []
     steps = 0
     while True:
-        # render an image
         if render:
             if hasattr(env, "sim"):
                 img = env.sim.render(camera_name="track", height=500, width=500)[::-1]
@@ -41,16 +37,14 @@ def sample_trajectory(
         steps += 1
         rollout_done = done or steps >= max_length
 
-        # record result of taking that action
         obs.append(ob)
         acs.append(ac)
         rewards.append(rew)
         next_obs.append(next_ob)
         terminals.append(rollout_done)
 
-        ob = next_ob  # jump to next timestep
+        ob = next_ob
 
-        # end the rollout if the rollout ended
         if rollout_done:
             break
 
@@ -71,15 +65,13 @@ def sample_trajectories(
     max_length: int,
     render: bool = False,
 ) -> tuple[list[dict[str, np.ndarray]], int]:
-    """Collect rollouts using policy until we have collected min_timesteps_per_batch steps."""
+    """Collect complete episodes until the batch reaches its step budget."""
     timesteps_this_batch = 0
     trajs = []
     while timesteps_this_batch < min_timesteps_per_batch:
-        # collect rollout
         traj = sample_trajectory(env, policy, max_length, render)
         trajs.append(traj)
 
-        # count steps
         timesteps_this_batch += get_traj_length(traj)
     return trajs, timesteps_this_batch
 
@@ -90,7 +82,6 @@ def sample_n_trajectories(
     """Collect ntraj rollouts."""
     trajs = []
     for _ in range(ntraj):
-        # collect rollout
         traj = sample_trajectory(env, policy, max_length, render)
         trajs.append(traj)
     return trajs
@@ -99,15 +90,12 @@ def sample_n_trajectories(
 def compute_metrics(trajs, eval_trajs):
     """Compute metrics for logging."""
 
-    # returns, for logging
     train_returns = [traj["reward"].sum() for traj in trajs]
     eval_returns = [eval_traj["reward"].sum() for eval_traj in eval_trajs]
 
-    # episode lengths, for logging
     train_ep_lens = [len(traj["reward"]) for traj in trajs]
     eval_ep_lens = [len(eval_traj["reward"]) for eval_traj in eval_trajs]
 
-    # decide what to log
     logs = OrderedDict()
     logs["Eval_AverageReturn"] = np.mean(eval_returns)
     logs["Eval_StdReturn"] = np.std(eval_returns)
@@ -125,10 +113,7 @@ def compute_metrics(trajs, eval_trajs):
 
 
 def convert_listofrollouts(trajs):
-    """
-    Take a list of rollout dictionaries and return separate arrays, where each array is a concatenation of that array
-    from across the rollouts.
-    """
+    """Concatenate rollout fields, also returning rewards grouped by episode."""
     observations = np.concatenate([traj["observation"] for traj in trajs])
     actions = np.concatenate([traj["action"] for traj in trajs])
     next_observations = np.concatenate([traj["next_observation"] for traj in trajs])

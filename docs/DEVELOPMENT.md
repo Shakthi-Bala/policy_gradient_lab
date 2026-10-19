@@ -33,8 +33,8 @@ The NumPy inference backend is specified in the generated commands, so it is
 also recorded in `flags.json`. The default training CLI uses PyTorch inference.
 
 A batch can exceed its nominal step count because rollouts finish their episodes.
-Every tenth iteration refreshes `agent.pt`, `flags.json`, and `log.pkl` atomically
-for the model. The final checkpoint contains network parameters, not optimizer
+Every tenth iteration refreshes `agent.pt`, `flags.json`, and `log.pkl`.
+Only the model checkpoint is replaced atomically. The final checkpoint contains network parameters, not optimizer
 state or a resumable simulator/RNG snapshot. Partial CSVs can be inspected while
 training; analysis and packaging only accept completed runs. If a process is
 interrupted, rerunning the matrix starts that configuration from its initial seed

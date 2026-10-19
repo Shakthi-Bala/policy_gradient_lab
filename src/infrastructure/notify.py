@@ -1,4 +1,4 @@
-"""Send explicitly requested project updates to a private Discord webhook."""
+"""Send experiment summaries and media to a configured Discord webhook."""
 
 import argparse
 import json

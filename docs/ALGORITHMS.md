@@ -47,7 +47,7 @@ The algorithm averages over transitions, following the official starter's
 vectorized convention. It is on-policy: after one actor update, the collected
 batch is discarded and the updated policy gathers new experience.
 
-## Checks that protect the math
+## Numerical tests
 
 `tests/test_policy_gradient.py` verifies hand-computed discounted targets,
 independence across episodes, GAE endpoints and masks, constant-batch
