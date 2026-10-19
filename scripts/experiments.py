@@ -150,6 +150,12 @@ def experiments():
                 "args": [*baseline["args"], "--seed", str(seed)],
             }
         )
+    normalized_args = baseline["args"].copy()
+    normalized_args[normalized_args.index("--exp_name") + 1] = "cheetah_baseline_na"
+    normalized_args.append("-na")
+    jobs.append(
+        {"group": "cheetah", "name": "cheetah_baseline_na", "args": normalized_args}
+    )
     return jobs
 
 
@@ -235,7 +241,7 @@ def run_locked_job(job, notify):
     duration = (time.monotonic() - started) / 60
     directory = completed_directory(job)
     if returncode or directory is None:
-        message = f"FAILED {name}; inspect artifacts/console/{name}.log"
+        message = f"FAILED {name} seed {job.get('seed', 1)}; inspect artifacts/console/{name}_sd{job.get('seed', 1)}.log"
     else:
         with (directory / "log.csv").open() as handle:
             rows = list(csv.DictReader(handle))

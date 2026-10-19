@@ -14,6 +14,10 @@ all 30 fresh evaluation episodes** after 102,080 training transitions. The demo
 shows a separate stochastic rollout of that final checkpoint. [Evaluation data](docs/evaluation/cartpole.json)
 · [MP4](media/cartpole_demo.mp4) · [Full experiment report](docs/RESULTS.md)
 
+**Sample efficiency:** InvertedPendulum first reached return **1,000 at 36,372
+training steps**. Its final checkpoint averaged **949.8 over 30 fresh episodes**.
+[Evaluation data](docs/evaluation/pendulum.json).
+
 ## Engineering highlights
 
 - **Policy learning:** categorical and diagonal Gaussian neural policies trained
