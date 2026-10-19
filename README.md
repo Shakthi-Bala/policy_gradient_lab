@@ -51,11 +51,13 @@ configuration supplies SWIG for Box2D automatically. No API key is needed.
 | Bias–variance tradeoff | LunarLander-v2 | How does GAE λ affect policy performance? |
 | Sample efficiency | InvertedPendulum-v4 | Can tuning reach return 1,000 within 100,000 training transitions? |
 
-The four small-batch CartPole ablations are complete; larger-batch and remaining
-environment experiments are running. [Measured results and discussion](docs/RESULTS.md)
+All eight CartPole ablations are complete; HalfCheetah, LunarLander, and
+InvertedPendulum experiments are in progress. [Measured results and discussion](docs/RESULTS.md)
 show peak, final, and trailing-ten mean returns, with links to raw CSVs.
 
 ![CartPole return-estimator comparison](media/cartpole_small.png)
+
+[Large-batch comparison](media/cartpole_large.png)
 
 ```bash
 # Full assignment matrix, with one BLAS thread per process and explicit CPU inference

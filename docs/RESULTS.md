@@ -6,6 +6,10 @@ All primary ablations use **seed 1**. Peak return is the best single evaluation 
 
 | Experiment | Peak eval | Final eval | Last 10 mean | Training steps | First target steps |
 |---|---:|---:|---:|---:|---:|
+| [cartpole_lb_na](../exp/CartPole-v0_cartpole_lb_na_sd1_20261019_165747/log.csv) | 200.0 | 200.0 | 200.0 | 401,861 | 44,274 |
+| [cartpole_lb_rtg_na](../exp/CartPole-v0_cartpole_lb_rtg_na_sd1_20261019_170021/log.csv) | 200.0 | 200.0 | 200.0 | 403,417 | 69,020 |
+| [cartpole_lb_rtg](../exp/CartPole-v0_cartpole_lb_rtg_sd1_20261019_165513/log.csv) | 200.0 | 200.0 | 200.0 | 403,846 | 73,115 |
+| [cartpole_lb](../exp/CartPole-v0_cartpole_lb_sd1_20261019_165237/log.csv) | 200.0 | 200.0 | 165.0 | 406,820 | 77,340 |
 | [cartpole_na](../exp/CartPole-v0_cartpole_na_sd1_20261019_165027/log.csv) | 200.0 | 200.0 | 200.0 | 102,080 | 21,151 |
 | [cartpole_rtg_na](../exp/CartPole-v0_cartpole_rtg_na_sd1_20261019_165125/log.csv) | 200.0 | 200.0 | 165.5 | 105,992 | 18,004 |
 | [cartpole_rtg](../exp/CartPole-v0_cartpole_rtg_sd1_20261019_164922/log.csv) | 200.0 | 200.0 | 186.7 | 105,319 | 41,159 |
@@ -20,6 +24,14 @@ Targets: CartPole 200; HalfCheetah 300; LunarLander 150; InvertedPendulum 1,000.
 Normalization changed the trajectory last-ten evaluation mean by +73.7 points.
 
 Normalization changed the reward-to-go last-ten evaluation mean by -21.2 points.
+
+**Large batch (4,000).** Last-ten mean evaluation returns: trajectory 165.0, reward-to-go 200.0, normalized trajectory 200.0, normalized reward-to-go 200.0. Without normalization, reward-to-go performed better by this endpoint metric.
+
+Normalization changed the trajectory last-ten evaluation mean by +35.0 points.
+
+Normalization changed the reward-to-go last-ten evaluation mean by +0.0 points.
+
+With normalized reward-to-go, increasing the batch changed the last-ten mean from 165.5 to 200.0. The first 200-return evaluations occurred at 18004 and 69020 training steps respectively (None means never reached).
 
 Reward-to-go is generally preferred because an action cannot influence past rewards. Removing those past terms preserves the expected score-function gradient while usually reducing its variance. Relative discounting weights future rewards from each decision.
 
