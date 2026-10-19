@@ -67,6 +67,8 @@ def load_runs():
                 "iterations": len(rows),
                 "training_steps": int(rows[-1]["Train_EnvstepsSoFar"]),
                 "peak_eval_return": max(returns),
+                "peak_train_return": max(row["Train_AverageReturn"] for row in rows),
+                "final_train_return": rows[-1]["Train_AverageReturn"],
                 "final_eval_return": returns[-1],
                 "last10_mean_eval_return": float(np.mean(returns[-10:])),
                 "threshold": threshold,
