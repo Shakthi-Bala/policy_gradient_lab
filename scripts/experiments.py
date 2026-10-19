@@ -79,6 +79,7 @@ def experiments():
             "--use_baseline",
             "--gae_lambda",
             lam,
+            "--prune_lunar_particles",
         ]
         jobs.append(
             {"group": "lunar", "name": f"lunar_lander_lambda{lam}", "args": args}

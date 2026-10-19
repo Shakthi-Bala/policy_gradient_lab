@@ -21,12 +21,18 @@ from PIL import Image, ImageDraw, ImageFont
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 from agents.pg_agent import PGAgent
+from infrastructure.envs import make_env
 from infrastructure.notify import send_update
 
 
-def load_agent(directory):
+def load_agent(directory, for_render=False):
     flags = json.loads((directory / "flags.json").read_text())
-    env = gym.make(flags["env_name"], disable_env_checker=True)
+    env = make_env(
+        flags["env_name"],
+        prune_lunar_particles=flags.get("prune_lunar_particles", False)
+        and not for_render,
+        disable_env_checker=True,
+    )
     discrete = isinstance(env.action_space, gym.spaces.Discrete)
     agent = PGAgent(
         ob_dim=env.observation_space.shape[0],
@@ -64,7 +70,7 @@ def main():
     torch.set_num_threads(1)
     torch.manual_seed(args.seed)
     np.random.seed(args.seed)
-    agent, env, flags = load_agent(args.run)
+    agent, env, flags = load_agent(args.run, for_render=True)
     result = env.reset(seed=args.seed)
     obs = result[0] if isinstance(result, tuple) else result
     fps = int(env.metadata.get("render_fps", 30))

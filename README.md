@@ -25,6 +25,9 @@ shows a separate stochastic rollout of that final checkpoint. [Evaluation data](
   saved model checkpoints.
 - **Experiment workflow:** CSV metrics and model artifacts without cloud accounts;
   optional Weights & Biases tracking and private Discord updates.
+- **Simulator engineering:** fixed legacy headless exhaust-particle accumulation;
+  verified identical dynamics across 5,000 comparison steps and measured a
+  [16.4× environment-step CPU speedup](docs/lunar_runtime.json) on a long-hover trace.
 - **Verification:** numerical tests for discounted returns, GAE episode boundaries,
   probability gradients, baseline regression, and rollout budgets.
 

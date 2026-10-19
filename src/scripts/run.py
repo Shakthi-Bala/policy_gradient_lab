@@ -13,6 +13,7 @@ import torch
 from agents.pg_agent import PGAgent
 from infrastructure import pytorch_util as ptu
 from infrastructure import utils
+from infrastructure.envs import make_env
 from infrastructure.log_utils import Logger, dump_log, setup_wandb, write_provenance
 
 MAX_NVIDEO = 2
@@ -26,11 +27,21 @@ def run_training_loop(logger, args):
     ptu.init_gpu(use_gpu=not args.no_gpu, gpu_id=args.which_gpu)
 
     # make the gym environment
-    env = gym.make(args.env_name, render_mode=None, disable_env_checker=True)
+    env = make_env(
+        args.env_name,
+        prune_lunar_particles=args.prune_lunar_particles,
+        render_mode=None,
+        disable_env_checker=True,
+    )
     env.reset(seed=args.seed)
     env.action_space.seed(args.seed)
     # Evaluation uses a separate RNG stream and never changes training observations.
-    eval_env = gym.make(args.env_name, render_mode=None, disable_env_checker=True)
+    eval_env = make_env(
+        args.env_name,
+        prune_lunar_particles=args.prune_lunar_particles,
+        render_mode=None,
+        disable_env_checker=True,
+    )
     eval_env.reset(seed=args.seed + 10000)
     discrete = isinstance(env.action_space, gym.spaces.Discrete)
 
@@ -168,6 +179,7 @@ def setup_arguments(args=None):
     parser.add_argument(
         "--rollout_backend", choices=["torch", "numpy"], default="torch"
     )
+    parser.add_argument("--prune_lunar_particles", action="store_true")
     parser.add_argument("--torch_threads", type=int, default=1)
     parser.add_argument("--checkpoint_freq", type=int, default=10)
     args = parser.parse_args(args=args)

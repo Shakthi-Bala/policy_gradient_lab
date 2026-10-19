@@ -153,3 +153,32 @@ def test_numpy_categorical_sampling_matches_distribution():
     samples = np.array([policy.get_action(obs) for _ in range(4000)])
     observed = np.bincount(samples, minlength=3) / len(samples)
     np.testing.assert_allclose(observed, expected, atol=0.03)
+
+
+@pytest.mark.parametrize("seed", [1, 17, 42])
+def test_lunar_particle_cleanup_preserves_exact_dynamics(seed):
+    from infrastructure.envs import make_env
+
+    reference = make_env("LunarLander-v2", disable_env_checker=True)
+    optimized = make_env(
+        "LunarLander-v2", prune_lunar_particles=True, disable_env_checker=True
+    )
+    np.testing.assert_array_equal(
+        reference.reset(seed=seed), optimized.reset(seed=seed)
+    )
+    rng = np.random.default_rng(seed)
+    try:
+        for step in range(1000):
+            action = int(rng.integers(4))
+            expected, actual = reference.step(action), optimized.step(action)
+            np.testing.assert_array_equal(expected[0], actual[0])
+            assert expected[1:3] == actual[1:3]
+            assert len(optimized.unwrapped.particles) == 0
+            if expected[2]:
+                np.testing.assert_array_equal(
+                    reference.reset(seed=seed + step + 1),
+                    optimized.reset(seed=seed + step + 1),
+                )
+    finally:
+        reference.close()
+        optimized.close()

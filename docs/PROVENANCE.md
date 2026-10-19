@@ -62,3 +62,28 @@ when the host's one-core CPU quota became apparent. Its partial logs are retaine
 locally under ignored `artifacts/pilot_torch/`; those partial runs are excluded
 from experimental comparisons. All reported runs use the explicitly recorded
 NumPy backend with `OPENBLAS_NUM_THREADS=1` (set by the experiment runner).
+
+## Legacy LunarLander headless performance fix
+
+The final LunarLander matrix explicitly enables `--prune_lunar_particles`.
+Gym 0.25.2 creates exhaust bodies during every engine firing but decrements their
+lifetimes only in `render()`. Long headless episodes therefore accumulate hundreds
+of decorative bodies. `LunarParticleCleanup` removes them **after** the original
+step has computed observations, rewards, and termination. Particle creation,
+random draws and lander impulses still execute unchanged. Their collision mask
+includes static ground only, so particles cannot collide with the lander or legs.
+The standard renderer is retained for exported videos.
+
+Three 1,000-step randomized traces (seeds 1, 17, 42) are regression-tested for
+bitwise-identical observations, rewards and termination against unmodified Gym.
+A separate 2,000-step deterministic long-hover trace also matched exactly and
+measured **16.4× lower environment-step CPU cost** on this host. This is a simulator
+microbenchmark, not an end-to-end training speedup. Raw measurement:
+[`lunar_runtime.json`](lunar_runtime.json). Reproduce it with
+`uv run python scripts/benchmark_lunar.py`.
+
+The five incomplete unoptimized LunarLander runs were archived under ignored
+`artifacts/pilot_lunar_particles/` and restarted from their original seed with
+all prescribed learning hyperparameters unchanged. No completed LunarLander runs
+were discarded. Reported runs use the explicit cleanup flag; the default training
+CLI continues to use unmodified Gym unless the flag is supplied.

@@ -1,0 +1,16 @@
+{
+  "environment": "LunarLander-v2",
+  "gym": "0.25.2",
+  "seed": 17,
+  "steps_compared": 2000,
+  "observations_rewards_terminals_bitwise_identical": true,
+  "reference_step_cpu_seconds": 2.4321025260000058,
+  "cleanup_step_cpu_seconds": 0.14796854600000103,
+  "step_cpu_speedup": 16.43661840131881,
+  "peak_particles": [
+    615,
+    0
+  ],
+  "policy": "deterministic course heuristic with normalized hover height offset 0.8",
+  "note": "Environment-step microbenchmark only; excludes neural inference and optimization."
+}

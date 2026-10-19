@@ -27,6 +27,8 @@ matching training process is still alive, it adopts that process and waits for
 its completed artifacts instead of starting over. `--group cartpole`, `cheetah`, `lunar`, or `pendulum`
 limits its scope. Console output is saved in ignored `artifacts/console/`; all
 metrics/configs/checkpoints needed for reproduction are versioned under `exp/`.
+The LunarLander commands enable a tested visual-particle cleanup option; see
+[PROVENANCE.md](PROVENANCE.md) for exact-equivalence checks and a CPU benchmark.
 The NumPy inference backend is specified in the generated commands, so it is
 also recorded in `flags.json`. The default training CLI uses PyTorch inference.
 
