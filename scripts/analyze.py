@@ -299,7 +299,10 @@ def results_markdown(runs):
         "",
         (
             "The official starter uses standard LunarLander-v2 without an additional action-noise "
-            "wrapper; this protocol is preserved. See [PROVENANCE.md](PROVENANCE.md)."
+            "wrapper; this protocol is preserved. Headless runs explicitly prune visual-only exhaust "
+            "particles after each original environment step. Observations, rewards and termination "
+            "were bitwise identical in 5,000 comparison steps; learning hyperparameters are unchanged. "
+            "See [PROVENANCE.md](PROVENANCE.md) and the recorded cleanup flag."
         ),
         "",
         "![GAE comparison](../media/lunar_gae.png)",
