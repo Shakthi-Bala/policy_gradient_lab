@@ -34,7 +34,7 @@ def send_update(message, attachments=()):
         try:
             files = {}
             for i, path in enumerate(attachments):
-                handle = stack.enter_context(Path(path).open("rb"))
+                handle = stack.enter_context(Path(path).open("rb"))  # noqa: SIM115 - ExitStack closes dynamic attachments
                 files[f"files[{i}]"] = (Path(path).name, handle)
             response = requests.post(
                 url,

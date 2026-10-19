@@ -167,6 +167,7 @@ def run_job(job, notify):
     with (log_dir / f"{name}.log").open("w") as handle:
         result = subprocess.run(
             [sys.executable, "src/scripts/run.py", *job["args"]],
+            check=False,
             cwd=ROOT,
             stdout=handle,
             stderr=subprocess.STDOUT,

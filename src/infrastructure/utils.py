@@ -33,7 +33,7 @@ def sample_trajectory(
 
         result = env.step(ac)
         if len(result) == 5:
-            next_ob, rew, terminated, truncated, info = result
+            next_ob, rew, terminated, truncated, _info = result
             done = terminated or truncated
         else:
             next_ob, rew, done, _info = result
