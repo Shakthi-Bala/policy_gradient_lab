@@ -4,16 +4,23 @@ Generated from completed run CSVs by `uv run python scripts/analyze.py`.
 
 All primary ablations use **seed 1**. Peak return is the best single evaluation batch; final and trailing-ten means are also reported to expose instability. Evaluation samples are stochastic and limited; these are not confidence intervals or multi-seed guarantees.
 
-| Experiment | Peak eval | Final eval | Last 10 mean | Training steps | First target steps |
-|---|---:|---:|---:|---:|---:|
-| [cartpole_lb_na](../exp/CartPole-v0_cartpole_lb_na_sd1_20261019_165747/log.csv) | 200.0 | 200.0 | 200.0 | 401,861 | 44,274 |
-| [cartpole_lb_rtg_na](../exp/CartPole-v0_cartpole_lb_rtg_na_sd1_20261019_170021/log.csv) | 200.0 | 200.0 | 200.0 | 403,417 | 69,020 |
-| [cartpole_lb_rtg](../exp/CartPole-v0_cartpole_lb_rtg_sd1_20261019_165513/log.csv) | 200.0 | 200.0 | 200.0 | 403,846 | 73,115 |
-| [cartpole_lb](../exp/CartPole-v0_cartpole_lb_sd1_20261019_165237/log.csv) | 200.0 | 200.0 | 165.0 | 406,820 | 77,340 |
-| [cartpole_na](../exp/CartPole-v0_cartpole_na_sd1_20261019_165027/log.csv) | 200.0 | 200.0 | 200.0 | 102,080 | 21,151 |
-| [cartpole_rtg_na](../exp/CartPole-v0_cartpole_rtg_na_sd1_20261019_165125/log.csv) | 200.0 | 200.0 | 165.5 | 105,992 | 18,004 |
-| [cartpole_rtg](../exp/CartPole-v0_cartpole_rtg_sd1_20261019_164922/log.csv) | 200.0 | 200.0 | 186.7 | 105,319 | 41,159 |
-| [cartpole](../exp/CartPole-v0_cartpole_sd1_20261019_164817/log.csv) | 200.0 | 122.0 | 126.3 | 104,024 | 20,711 |
+| Experiment | Seed | Peak eval | Final eval | Last 10 mean | Training steps | First target steps |
+|---|---:|---:|---:|---:|---:|---:|
+| [cartpole_lb_na](../exp/CartPole-v0_cartpole_lb_na_sd1_20261019_165747/log.csv) | 1 | 200.0 | 200.0 | 200.0 | 401,861 | 44,274 |
+| [cartpole_lb_rtg_na](../exp/CartPole-v0_cartpole_lb_rtg_na_sd1_20261019_170021/log.csv) | 1 | 200.0 | 200.0 | 200.0 | 403,417 | 69,020 |
+| [cartpole_lb_rtg](../exp/CartPole-v0_cartpole_lb_rtg_sd1_20261019_165513/log.csv) | 1 | 200.0 | 200.0 | 200.0 | 403,846 | 73,115 |
+| [cartpole_lb](../exp/CartPole-v0_cartpole_lb_sd1_20261019_165237/log.csv) | 1 | 200.0 | 200.0 | 165.0 | 406,820 | 77,340 |
+| [cartpole_na](../exp/CartPole-v0_cartpole_na_sd1_20261019_165027/log.csv) | 1 | 200.0 | 200.0 | 200.0 | 102,080 | 21,151 |
+| [cartpole_rtg_na](../exp/CartPole-v0_cartpole_rtg_na_sd1_20261019_165125/log.csv) | 1 | 200.0 | 200.0 | 165.5 | 105,992 | 18,004 |
+| [cartpole_rtg](../exp/CartPole-v0_cartpole_rtg_sd1_20261019_164922/log.csv) | 1 | 200.0 | 200.0 | 186.7 | 105,319 | 41,159 |
+| [cartpole](../exp/CartPole-v0_cartpole_sd1_20261019_164817/log.csv) | 1 | 200.0 | 122.0 | 126.3 | 104,024 | 20,711 |
+| [cheetah_baseline_bgs1](../exp/HalfCheetah-v4_cheetah_baseline_bgs1_sd1_20261019_170144/log.csv) | 1 | -54.8 | -54.8 | -154.3 | 500,000 | — |
+| [cheetah_baseline](../exp/HalfCheetah-v4_cheetah_baseline_sd1_20261019_170143/log.csv) | 1 | 389.2 | 104.9 | 127.0 | 500,000 | 435,000 |
+| [cheetah](../exp/HalfCheetah-v4_cheetah_sd1_20261019_170145/log.csv) | 1 | -204.9 | -231.2 | -235.2 | 500,000 | — |
+| [pendulum](../exp/InvertedPendulum-v4_pendulum_sd1_20261019_171447/log.csv) | 1 | 1000.0 | 6.3 | 71.7 | 509,717 | 431,837 |
+| [pendulum_tuned_fast](../exp/InvertedPendulum-v4_pendulum_tuned_fast_sd1_20261019_171751/log.csv) | 1 | 1000.0 | 142.9 | 138.9 | 108,688 | 26,939 |
+| [pendulum_tuned](../exp/InvertedPendulum-v4_pendulum_tuned_sd1_20261019_171455/log.csv) | 1 | 1000.0 | 222.4 | 372.7 | 106,469 | 40,028 |
+| [pendulum_tuned_small](../exp/InvertedPendulum-v4_pendulum_tuned_small_sd1_20261019_171505/log.csv) | 1 | 1000.0 | 1000.0 | 932.3 | 73,468 | 36,372 |
 
 Targets: CartPole 200; HalfCheetah 300; LunarLander 150; InvertedPendulum 1,000.
 
@@ -43,6 +50,14 @@ Normalization rescales the update and subtracts a batch mean; it is a useful heu
 
 ## 2. HalfCheetah: learned baseline
 
+**cheetah:** peak -204.9; final -231.2.
+
+**cheetah_baseline:** peak 389.2; final 104.9. Baseline MSE (mean over optimizer steps on each training batch) changed from 178.8 to 22.2.
+
+**cheetah_baseline_bgs1:** peak -54.8; final -54.8. Baseline MSE (mean over optimizer steps on each training batch) changed from 193.6 to 30.3.
+
+Adding a baseline changed the last-ten evaluation mean from -235.2 to 127.0. Reducing its updates to one changed that mean to -154.3; final training-batch baseline MSE was 22.2 with five updates and 30.3 with one.
+
 The one-gradient-step ablation keeps the baseline learning rate at 0.01 and reduces value updates from five to one. This slows fitting to the current batch; policy outcomes above show whether that change helped this seed. Value targets change with the policy, so training MSE need not decrease monotonically, and lower training MSE alone does not prove better control. The baseline uses raw targets.
 
 ![HalfCheetah return](../media/cheetah_returns.png)
@@ -53,13 +68,32 @@ The one-gradient-step ablation keeps the baseline learning rate at 0.01 and redu
 
 λ=0 uses one-step TD residuals, reducing variance while depending heavily on value accuracy. λ=1 telescopes to Monte Carlo reward-to-go minus the baseline under the zero-tail boundary convention, reducing bootstrap bias while increasing variance. Intermediate λ mixes horizons. The observed ranking above and curves below reflect this seed, not a universal monotonic relationship. All five runs retain the PDF’s fixed batch size, learning rate, architecture, discount, and iteration budget.
 
-The official starter uses standard LunarLander-v2 without an additional action-noise wrapper; this protocol is preserved. See [PROVENANCE.md](PROVENANCE.md).
+The official starter uses standard LunarLander-v2 without an additional action-noise wrapper; this protocol is preserved. Headless runs explicitly prune visual-only exhaust particles after each original environment step. Observations, rewards and termination were bitwise identical in 5,000 comparison steps; learning hyperparameters are unchanged. See [PROVENANCE.md](PROVENANCE.md) and the recorded cleanup flag.
 
 ![GAE comparison](../media/lunar_gae.png)
 
 ## 4. InvertedPendulum: sample efficiency
 
-No completed run has reached the 1,000-return target yet.
+Earliest observed 1,000-return evaluation: **pendulum_tuned_fast**, at **26,939 training steps**. The below-100K target was met.
+
+```json
+{
+  "batch_size": 1000,
+  "discount": 0.99,
+  "learning_rate": 0.02,
+  "n_layers": 2,
+  "layer_size": 64,
+  "use_reward_to_go": true,
+  "normalize_advantages": true,
+  "use_baseline": true,
+  "baseline_gradient_steps": 10,
+  "gae_lambda": 0.95
+}
+```
+
+The earliest-crossing run ended at 142.9. The highest trailing-ten mean belonged to pendulum_tuned_small (932.3), whose final evaluation was 1000.0. First threshold crossing and sustained performance are different criteria.
+
+The matched 1,000-step-batch candidates differ only in actor learning rate: 0.01 first reached 1,000 at 40028 steps and ended at 222.4; 0.02 first reached it at 26939 steps and ended at 142.9. The larger rate accelerated the initial crossing in this seed, while both candidates later lost performance.
 
 Tuning reduces batches from 5,000 to 500 or 1,000 transitions to allow more frequent policy updates per interaction budget, and combines reward-to-go, normalization, a value baseline, γ=0.99 and GAE. The candidates also vary learning rate and λ. These coupled changes are a configuration search, not a controlled causal attribution of gains to any one hyperparameter. All attempts are retained.
 
@@ -67,7 +101,7 @@ Tuning reduces batches from 5,000 to 500 or 1,000 transitions to allow more freq
 
 ## Reproduction and limitations
 
-Exact command lines are in [commands.sh](commands.sh); per-run flags and source revision are beside each CSV. The eight CartPole, three HalfCheetah, five LunarLander, and four InvertedPendulum configurations are generated by `scripts/experiments.py`.
+Exact command lines are in [commands.sh](commands.sh); per-run flags and source revision are beside each CSV. The eight CartPole, three HalfCheetah, five LunarLander, and four InvertedPendulum configurations, plus two additional HalfCheetah baseline seeds and the optional normalized-baseline run, are generated by `scripts/experiments.py`.
 
 Single-seed comparisons and peak selection can be optimistic. A larger study should repeat every setting over independent seeds and evaluate saved policies over many held-out episodes. Training steps exclude evaluation interactions as required by the assignment. Time-limit tails are zero, not bootstrapped. Videos show individual rollouts of final checkpoints and do not establish average performance.
 
@@ -78,3 +112,5 @@ Configurations are selected from the benchmark comparisons. Each frozen final po
 | Selected policy | Episodes | Mean return | Standard deviation | Bootstrap 95% CI |
 |---|---:|---:|---:|---| 
 | [cartpole_na](evaluation/cartpole.json) | 30 | 200.0 | 0.0 | [200.0, 200.0] |
+| [cheetah_baseline](evaluation/cheetah_seed1.json) | 30 | 96.1 | 111.4 | [52.3, 131.6] |
+| [pendulum_tuned_small](evaluation/pendulum.json) | 30 | 949.8 | 199.2 | [871.1, 1000.0] |

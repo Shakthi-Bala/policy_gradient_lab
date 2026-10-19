@@ -1,0 +1,27 @@
+{
+  "command": [
+    "uv",
+    "run",
+    "src/scripts/run.py",
+    "--env_name",
+    "InvertedPendulum-v4",
+    "-n",
+    "100",
+    "-b",
+    "5000",
+    "-eb",
+    "1000",
+    "--exp_name",
+    "pendulum",
+    "--no_gpu",
+    "--rollout_backend",
+    "numpy"
+  ],
+  "git_revision": "7db7f39589dfa895a99c7c713af51cbf596873e4",
+  "git_dirty": true,
+  "python": "3.10.22",
+  "torch": "2.14.1+cpu",
+  "numpy": "1.26.4",
+  "gym": "0.25.2",
+  "started_at_utc": "2026-10-19T21:14:47.578144+00:00"
+}
