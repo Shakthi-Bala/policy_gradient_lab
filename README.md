@@ -7,6 +7,13 @@ locomotion, and sample efficiency. Built from the Berkeley CS285 Spring 2026
 [policy gradient assignment](hw2.pdf), with implemented learning algorithms,
 local experiment tracking, correctness tests, and automated comparisons.
 
+![Trained CartPole policy](media/cartpole_demo.gif)
+
+**Verified result:** the normalized CartPole policy achieved **200/200 return in
+all 30 fresh evaluation episodes** after 102,080 training transitions. The demo
+shows a separate stochastic rollout of that final checkpoint. [Evaluation data](docs/evaluation/cartpole.json)
+· [MP4](media/cartpole_demo.mp4) · [Full experiment report](docs/RESULTS.md)
+
 ## Engineering highlights
 
 - **Policy learning:** categorical and diagonal Gaussian neural policies trained
@@ -15,7 +22,7 @@ local experiment tracking, correctness tests, and automated comparisons.
   normalization, learned state-value baselines, and GAE with tunable λ.
 - **Reproducibility:** locked CPU dependencies, explicit seeds, independent
   evaluation environments, actual transition counts, source provenance, and
-  recoverable checkpoints.
+  saved model checkpoints.
 - **Experiment workflow:** CSV metrics and model artifacts without cloud accounts;
   optional Weights & Biases tracking and private Discord updates.
 - **Verification:** numerical tests for discounted returns, GAE episode boundaries,
@@ -23,7 +30,7 @@ local experiment tracking, correctness tests, and automated comparisons.
 
 ## Quick start
 
-Requires Linux/macOS, Python 3.10, and [uv](https://docs.astral.sh/uv/).
+Tested on Linux x86_64 with Python 3.10 and [uv](https://docs.astral.sh/uv/).
 
 ```bash
 uv sync
@@ -44,9 +51,22 @@ configuration supplies SWIG for Box2D automatically. No API key is needed.
 | Bias–variance tradeoff | LunarLander-v2 | How does GAE λ affect policy performance? |
 | Sample efficiency | InvertedPendulum-v4 | Can tuning reach return 1,000 within 100,000 training transitions? |
 
-Experiments and the empirical report are being prepared. Results will be linked
-here after completed runs; the assignment's target scores are not claimed as
-observed performance.
+The four small-batch CartPole ablations are complete; larger-batch and remaining
+environment experiments are running. [Measured results and discussion](docs/RESULTS.md)
+show peak, final, and trailing-ten mean returns, with links to raw CSVs.
+
+![CartPole return-estimator comparison](media/cartpole_small.png)
+
+```bash
+# Full assignment matrix, with one BLAS thread per process and explicit CPU inference
+uv run python scripts/experiments.py --workers 4 --notify
+uv run python scripts/status.py
+uv run python scripts/analyze.py
+uv run python scripts/package_submission.py
+```
+
+See [exact experiment commands](docs/commands.sh), [algorithm notes](docs/ALGORITHMS.md),
+and the [development guide](docs/DEVELOPMENT.md).
 
 ## Repository
 

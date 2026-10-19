@@ -1,0 +1,62 @@
+[
+  {
+    "name": "cartpole_na",
+    "environment": "CartPole-v0",
+    "seed": 1,
+    "directory": "exp/CartPole-v0_cartpole_na_sd1_20261019_165027",
+    "iterations": 100,
+    "training_steps": 102080,
+    "peak_eval_return": 200.0,
+    "peak_train_return": 200.0,
+    "final_train_return": 200.0,
+    "final_eval_return": 200.0,
+    "last10_mean_eval_return": 200.0,
+    "threshold": 200,
+    "first_threshold_steps": 21151
+  },
+  {
+    "name": "cartpole_rtg_na",
+    "environment": "CartPole-v0",
+    "seed": 1,
+    "directory": "exp/CartPole-v0_cartpole_rtg_na_sd1_20261019_165125",
+    "iterations": 100,
+    "training_steps": 105992,
+    "peak_eval_return": 200.0,
+    "peak_train_return": 200.0,
+    "final_train_return": 196.8333282470703,
+    "final_eval_return": 200.0,
+    "last10_mean_eval_return": 165.525,
+    "threshold": 200,
+    "first_threshold_steps": 18004
+  },
+  {
+    "name": "cartpole_rtg",
+    "environment": "CartPole-v0",
+    "seed": 1,
+    "directory": "exp/CartPole-v0_cartpole_rtg_sd1_20261019_164922",
+    "iterations": 100,
+    "training_steps": 105319,
+    "peak_eval_return": 200.0,
+    "peak_train_return": 200.0,
+    "final_train_return": 200.0,
+    "final_eval_return": 200.0,
+    "last10_mean_eval_return": 186.73333282470702,
+    "threshold": 200,
+    "first_threshold_steps": 41159
+  },
+  {
+    "name": "cartpole",
+    "environment": "CartPole-v0",
+    "seed": 1,
+    "directory": "exp/CartPole-v0_cartpole_sd1_20261019_164817",
+    "iterations": 100,
+    "training_steps": 104024,
+    "peak_eval_return": 200.0,
+    "peak_train_return": 183.1666717529297,
+    "final_train_return": 116.33333587646484,
+    "final_eval_return": 122.0,
+    "last10_mean_eval_return": 126.33333282470703,
+    "threshold": 200,
+    "first_threshold_steps": 20711
+  }
+]

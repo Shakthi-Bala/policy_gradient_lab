@@ -1,0 +1,19 @@
+{
+  "run": "exp/CartPole-v0_cartpole_na_sd1_20261019_165027",
+  "seed": 42,
+  "steps": 200,
+  "return": 200.0,
+  "checkpoint": "final",
+  "stochastic": true,
+  "fps": 50,
+  "command": [
+    "uv",
+    "run",
+    "python",
+    "scripts/render_policy.py",
+    "exp/CartPole-v0_cartpole_na_sd1_20261019_165027",
+    "--output",
+    "media/cartpole_demo",
+    "--notify"
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "command": [
+    "uv",
+    "run",
+    "src/scripts/run.py",
+    "--env_name",
+    "CartPole-v0",
+    "-n",
+    "100",
+    "-b",
+    "1000",
+    "-rtg",
+    "--exp_name",
+    "cartpole_rtg",
+    "--no_gpu",
+    "--rollout_backend",
+    "numpy"
+  ],
+  "git_revision": "612ac8d6707b6e1f20fa70fdc9148f938790b6d7",
+  "git_dirty": true,
+  "python": "3.10.22",
+  "torch": "2.14.1+cpu",
+  "numpy": "1.26.4",
+  "gym": "0.25.2",
+  "started_at_utc": "2026-10-19T20:49:22.769787+00:00"
+}
