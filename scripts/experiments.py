@@ -2,6 +2,7 @@
 
 import argparse
 import csv
+import fcntl
 import json
 import os
 import shlex
@@ -10,6 +11,8 @@ import sys
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
+
+import psutil
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
@@ -153,7 +156,30 @@ def completed_directory(job):
     return None
 
 
+def running_process(job):
+    """Adopt an identical live run after an orchestrator restart."""
+    expected = ["src/scripts/run.py", *job["args"]]
+    for process in psutil.process_iter(["cmdline", "cwd"]):
+        try:
+            command = process.info["cmdline"] or []
+            if command[1:] == expected and process.info["cwd"] == str(ROOT):
+                return process
+        except (psutil.AccessDenied, psutil.NoSuchProcess):
+            continue
+    return None
+
+
 def run_job(job, notify):
+    # Two matrix invocations may overlap. Serialize each configuration, then
+    # recheck completion so they never launch the same job twice.
+    lock_dir = ROOT / "artifacts" / "locks"
+    lock_dir.mkdir(parents=True, exist_ok=True)
+    with (lock_dir / f"{job['name']}.lock").open("a") as handle:
+        fcntl.flock(handle, fcntl.LOCK_EX)
+        return run_locked_job(job, notify)
+
+
+def run_locked_job(job, notify):
     name = job["name"]
     existing = completed_directory(job)
     if existing:
@@ -170,22 +196,31 @@ def run_job(job, notify):
         MPLBACKEND="Agg",
         PYTHONUNBUFFERED="1",
     )
-    with (log_dir / f"{name}.log").open("w") as handle:
-        result = subprocess.run(
-            [sys.executable, "src/scripts/run.py", *job["args"]],
-            check=False,
-            cwd=ROOT,
-            stdout=handle,
-            stderr=subprocess.STDOUT,
-            env=env,
-        )
+    active = running_process(job)
+    returncode = 0
+    if active is not None:
+        print(f"ADOPT {name}: waiting for existing PID {active.pid}", flush=True)
+        while active.is_running() and active.status() != psutil.STATUS_ZOMBIE:
+            time.sleep(2)
+    else:
+        with (log_dir / f"{name}.log").open("w") as handle:
+            result = subprocess.run(
+                [sys.executable, "src/scripts/run.py", *job["args"]],
+                check=False,
+                cwd=ROOT,
+                stdout=handle,
+                stderr=subprocess.STDOUT,
+                env=env,
+            )
+        returncode = result.returncode
     duration = (time.monotonic() - started) / 60
     directory = completed_directory(job)
-    if result.returncode or directory is None:
+    if returncode or directory is None:
         message = f"FAILED {name}; inspect artifacts/console/{name}.log"
     else:
         with (directory / "log.csv").open() as handle:
             rows = list(csv.DictReader(handle))
+        duration = float(rows[-1]["TimeSinceStart"]) / 60
         peak = max(float(row["Eval_AverageReturn"]) for row in rows)
         final = float(rows[-1]["Eval_AverageReturn"])
         message = (
