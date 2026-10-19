@@ -318,6 +318,21 @@ def results_markdown(runs):
             ),
             "",
         ]
+    raw_baselines = [
+        run
+        for run in runs
+        if run["name"] in ("cheetah_baseline", "cheetah_baseline_torch")
+    ]
+    if raw_baselines:
+        best_raw = max(raw_baselines, key=lambda run: run["final_eval_return"])
+        outcome = "met" if best_raw["final_eval_return"] > 300 else "not met"
+        lines += [
+            f"**Unnormalized final-return target:** {outcome} in the recorded trials; "
+            f"best final evaluation {best_raw['final_eval_return']:.1f} "
+            f"({best_raw['name']}, seed {best_raw['seed']}). "
+            "The normalized optional result is kept separate from this check.",
+            "",
+        ]
     lines += [
         (
             "The one-gradient-step ablation keeps the baseline learning rate at 0.01 and "
@@ -343,6 +358,16 @@ def results_markdown(runs):
                 f"Best peak: **{best['name']}**, {best['peak_eval_return']:.1f}. Best trailing-ten "
                 f"mean: **{stable['name']}**, {stable['last10_mean_eval_return']:.1f}."
             ),
+            "",
+        ]
+    lunar_by_lambda = {run["flags"]["gae_lambda"]: run for run in lunar}
+    if 0.0 in lunar_by_lambda and 1.0 in lunar_by_lambda:
+        zero, one = lunar_by_lambda[0.0], lunar_by_lambda[1.0]
+        lines += [
+            f"At λ=0 the final evaluation was {zero['final_eval_return']:.1f}; at λ=1 it was "
+            f"{one['final_eval_return']:.1f}. In this seed, the longer-horizon Monte Carlo "
+            "endpoint outperformed one-step TD, while the best intermediate setting exceeded both. "
+            "The comparison is descriptive; each setting needs more training seeds for a reliable ranking.",
             "",
         ]
     lines += [
