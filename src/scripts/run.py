@@ -97,7 +97,7 @@ def run_training_loop(logger, args):
             trajs_dict["terminal"],
         )
 
-        if itr % args.scalar_log_freq == 0:
+        if itr % args.scalar_log_freq == 0 or itr == args.n_iter - 1:
             # save eval metrics
             print("\nCollecting data for eval...")
             eval_trajs, _eval_envsteps_this_batch = utils.sample_trajectories(

@@ -54,11 +54,23 @@ def main():
     files.extend((ROOT / "src").rglob("*.py"))
     files.extend(
         ROOT / name
-        for name in ("pyproject.toml", "uv.lock", "README.md", ".python-version")
+        for name in (
+            "pyproject.toml",
+            "uv.lock",
+            "README.md",
+            ".python-version",
+            ".gitignore",
+            ".env.example",
+            "hw2.pdf",
+        )
     )
     files.extend((ROOT / "scripts").glob("*.py"))
     files.extend((ROOT / "tests").glob("*.py"))
-    files.extend(path for path in (ROOT / "docs").iterdir() if path.is_file())
+    files.extend(
+        path
+        for path in (ROOT / "docs").rglob("*")
+        if path.is_file() and path.suffix in {".md", ".json", ".pdf", ".sh"}
+    )
     with zipfile.ZipFile(args.output, "w", compression=zipfile.ZIP_DEFLATED) as archive:
         for path in files:
             archive.write(path, path.relative_to(ROOT))
