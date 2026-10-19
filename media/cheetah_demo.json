@@ -1,0 +1,21 @@
+{
+  "run": "exp/HalfCheetah-v4_cheetah_baseline_na_sd1_20261019_172158",
+  "seed": 42,
+  "steps": 1000,
+  "return": 340.37832628725414,
+  "checkpoint": "final",
+  "stochastic": true,
+  "fps": 20,
+  "command": [
+    "uv",
+    "run",
+    "python",
+    "scripts/render_policy.py",
+    "exp/HalfCheetah-v4_cheetah_baseline_na_sd1_20261019_172158",
+    "--output",
+    "media/cheetah_demo",
+    "--notify"
+  ],
+  "gif_preview_seconds": 12.0,
+  "gif_preview_fps": 10.0
+}

@@ -1,0 +1,20 @@
+{
+  "run": "exp/HalfCheetah-v4_cheetah_baseline_torch_sd1_20261019_173442",
+  "seed": 42,
+  "steps": 1000,
+  "return": 449.0528423504445,
+  "checkpoint": "final",
+  "stochastic": true,
+  "fps": 20,
+  "gif_preview_seconds": 12.0,
+  "command": [
+    "uv",
+    "run",
+    "python",
+    "scripts/render_policy.py",
+    "exp/HalfCheetah-v4_cheetah_baseline_torch_sd1_20261019_173442",
+    "--output",
+    "media/cheetah_reference_demo",
+    "--notify"
+  ]
+}

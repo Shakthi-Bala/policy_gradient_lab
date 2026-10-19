@@ -187,13 +187,18 @@ def results_markdown(runs):
             label = (
                 "Small batch (1,000)" if prefix == "cartpole" else "Large batch (4,000)"
             )
+            if b["last10_mean_eval_return"] == a["last10_mean_eval_return"]:
+                comparison = "the estimators tied"
+            elif b["last10_mean_eval_return"] > a["last10_mean_eval_return"]:
+                comparison = "reward-to-go performed better"
+            else:
+                comparison = "trajectory returns performed better"
             lines += [
                 (
                     f"**{label}.** Last-ten mean evaluation returns: trajectory {a['last10_mean_eval_return']:.1f}, "
                     f"reward-to-go {b['last10_mean_eval_return']:.1f}, normalized trajectory "
                     f"{c['last10_mean_eval_return']:.1f}, normalized reward-to-go {d['last10_mean_eval_return']:.1f}. "
-                    f"Without normalization, {'reward-to-go' if b['last10_mean_eval_return'] > a['last10_mean_eval_return'] else 'trajectory returns'} "
-                    "performed better by this endpoint metric."
+                    f"Without normalization, {comparison} by this endpoint metric."
                 ),
                 "",
             ]
@@ -327,10 +332,12 @@ def results_markdown(runs):
         best_raw = max(raw_baselines, key=lambda run: run["final_eval_return"])
         outcome = "met" if best_raw["final_eval_return"] > 300 else "not met"
         lines += [
-            f"**Unnormalized final-return target:** {outcome} in the recorded trials; "
-            f"best final evaluation {best_raw['final_eval_return']:.1f} "
-            f"({best_raw['name']}, seed {best_raw['seed']}). "
-            "The normalized optional result is kept separate from this check.",
+            (
+                f"**Unnormalized final-return target:** {outcome} in the recorded trials; "
+                f"best final evaluation {best_raw['final_eval_return']:.1f} "
+                f"({best_raw['name']}, seed {best_raw['seed']}). "
+                "The normalized optional result is kept separate from this check."
+            ),
             "",
         ]
     lines += [
@@ -364,10 +371,12 @@ def results_markdown(runs):
     if 0.0 in lunar_by_lambda and 1.0 in lunar_by_lambda:
         zero, one = lunar_by_lambda[0.0], lunar_by_lambda[1.0]
         lines += [
-            f"At λ=0 the final evaluation was {zero['final_eval_return']:.1f}; at λ=1 it was "
-            f"{one['final_eval_return']:.1f}. In this seed, the longer-horizon Monte Carlo "
-            "endpoint outperformed one-step TD, while the best intermediate setting exceeded both. "
-            "The comparison is descriptive; each setting needs more training seeds for a reliable ranking.",
+            (
+                f"At λ=0 the final evaluation was {zero['final_eval_return']:.1f}; at λ=1 it was "
+                f"{one['final_eval_return']:.1f}. These endpoint measurements and the intermediate "
+                "settings above describe how the chosen horizon affected this particular training seed. "
+                "The comparison is descriptive; each setting needs more training seeds for a reliable ranking."
+            ),
             "",
         ]
     lines += [
@@ -508,6 +517,18 @@ def results_markdown(runs):
                 f"{result['mean_return']:.1f} | {result['std_return']:.1f} | [{low:.1f}, {high:.1f}] |"
             )
         lines += [""]
+    if (DOCS / "demo_selection.json").exists():
+        lines += [
+            "## Demonstration selection",
+            "",
+            (
+                "GIFs are short previews; MP4s retain full episodes. The LunarLander showcase is "
+                "an explicitly selected successful example, not a representative average. The selection "
+                "log records every candidate tried, and the original seed-42 failure video is retained. "
+                "The fresh-episode table above includes all 30 benchmark outcomes independently of demo selection."
+            ),
+            "",
+        ]
     return "\n".join(lines)
 
 

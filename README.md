@@ -1,118 +1,134 @@
 # Policy Gradient Lab
 
-**Learning control from experience with REINFORCE, value baselines, and generalized advantage estimation.**
+**Learning control with REINFORCE, value baselines, and generalized advantage estimation.**
 
-A reproducible reinforcement learning study spanning discrete control, continuous
-locomotion, and sample efficiency. Built from the Berkeley CS285 Spring 2026
-[policy gradient assignment](hw2.pdf), with implemented learning algorithms,
-local experiment tracking, correctness tests, and automated comparisons.
+A PyTorch reinforcement learning study with **24 recorded training runs across
+four environments**, held-out policy evaluation, real rollout videos, and a
+validated fix for a legacy simulator performance bug. Built from the
+[Berkeley CS285 Spring 2026 policy gradient assignment](hw2.pdf).
 
-![Trained CartPole policy](media/cartpole_demo.gif)
+## Measured results
 
-**Verified result:** the normalized CartPole policy achieved **200/200 return in
-all 30 fresh evaluation episodes** after 102,080 training transitions. The demo
-shows a separate stochastic rollout of that final checkpoint. [Evaluation data](docs/evaluation/cartpole.json)
-· [MP4](media/cartpole_demo.mp4) · [Full experiment report](docs/RESULTS.md)
+Selected final checkpoints, each evaluated on **30 fresh stochastic episodes**.
+Values are mean ± sample standard deviation; all selected policies use training
+seed 1. These describe episode variation, not uncertainty across training seeds.
 
-**Sample efficiency:** the selected stable InvertedPendulum configuration first
-reached return **1,000 at 36,372 training steps**. Its final checkpoint averaged
-**949.8 over 30 fresh episodes**. A faster, less stable candidate crossed at 26,939 steps.
-[Evaluation data](docs/evaluation/pendulum.json).
+| Environment | Policy configuration | Fresh-episode return | Evidence |
+|---|---|---:|---|
+| CartPole-v0 | Normalized trajectory returns | **200.0 ± 0.0 / 200** | [30 episodes](docs/evaluation/cartpole.json) |
+| HalfCheetah-v4 | Reward-to-go + value baseline, original PyTorch sampler | **409.0 ± 55.9** | [30 episodes](docs/evaluation/cheetah_reference.json) |
+| LunarLander-v2 | GAE, λ = 0.99 | **120.0 ± 143.7** | [30 episodes](docs/evaluation/lunar.json) |
+| InvertedPendulum-v4 | Small batches + normalized GAE | **949.8 ± 199.2 / 1,000** | [30 episodes](docs/evaluation/pendulum.json) |
 
-## Engineering highlights
+- **Sample efficiency:** the stable Pendulum configuration first reached return
+  1,000 at **36,372 training steps** and finished training after **73,468** steps.
+  A faster, less stable candidate crossed at 26,939; the default crossed at 431,837.
+- **Variance matters:** LunarLander peaked at 236.4 during training-time evaluation
+  and finished at 227.6, but its fresh-episode mean was 120.0. Peaks alone overstate
+  reliability. All unsuccessful configurations remain in the results.
+- **Baseline comparison:** the original-sampler unnormalized HalfCheetah baseline
+  finished at 374.2; three NumPy-sampler seeds finished below 300. The optional
+  normalized baseline averaged 354.5 over fresh episodes. Sampler RNG streams,
+  seeds, and exact flags are recorded rather than treated as interchangeable.
 
-- **Policy learning:** categorical and diagonal Gaussian neural policies trained
-  with Monte Carlo policy gradients.
-- **Variance reduction:** trajectory returns, reward-to-go, advantage
-  normalization, learned state-value baselines, and GAE with tunable λ.
-- **Reproducibility:** locked CPU dependencies, explicit seeds, independent
-  evaluation environments, actual transition counts, source provenance, and
-  saved model checkpoints.
-- **Experiment workflow:** CSV metrics and model artifacts without cloud accounts;
-  optional Weights & Biases tracking and private Discord updates.
-- **Simulator engineering:** fixed legacy headless exhaust-particle accumulation;
-  verified identical dynamics across 5,000 comparison steps and measured a
-  [16.4× environment-step CPU speedup](docs/lunar_runtime.json) on a long-hover trace.
-- **Verification:** numerical tests for discounted returns, GAE episode boundaries,
-  probability gradients, baseline regression, and rollout budgets.
+[Full results and assignment answers](docs/RESULTS.md) · [PDF report](docs/report.pdf)
+· [Exact commands](docs/commands.sh) · [Raw experiment artifacts](exp/)
+
+## Policy demonstrations
+
+Short GIF previews of frozen final policies; MP4 links contain complete episodes.
+An individual rollout does not establish average performance.
+
+| CartPole | HalfCheetah — unnormalized baseline |
+|---|---|
+| <img src="media/cartpole_demo.gif" width="360" alt="Trained CartPole policy" /> | <img src="media/cheetah_reference_demo.gif" width="360" alt="Trained HalfCheetah baseline policy" /> |
+| [Full video](media/cartpole_demo.mp4) | [Full video](media/cheetah_reference_demo.mp4) |
+
+| LunarLander — selected successful example | InvertedPendulum — stable small-batch policy |
+|---|---|
+| <img src="media/lunar_demo.gif" width="360" alt="Illustrative successful LunarLander rollout" /> | <img src="media/pendulum_demo.gif" width="360" alt="Learned InvertedPendulum controller" /> |
+| [Full video](media/lunar_demo.mp4) | [Full video](media/pendulum_demo.mp4) |
+
+The LunarLander success is explicitly selected for illustration; its
+[selection log](docs/demo_selection.json), [original seed-42 failure](media/lunar_seed42.mp4),
+and all 30 evaluation outcomes are retained. The optional normalized HalfCheetah
+controller also has a [GIF](media/cheetah_demo.gif) and [full video](media/cheetah_demo.mp4).
+
+## What is implemented
+
+- **Policy learning:** categorical and diagonal Gaussian MLP policies, discounted
+  trajectory returns, reward-to-go, advantage normalization, learned value
+  baselines, and GAE. Gradient updates use PyTorch; CPU rollouts can use a tested
+  NumPy inference path.
+- **Simulator engineering:** removed decorative exhaust accumulation in headless
+  LunarLander, measuring **16.4× faster environment stepping** on a long-hover
+  microbenchmark. State/reward/termination traces matched exactly over 5,000
+  comparison steps; learning metrics matched across **437 paired iterations**.
+  This is a simulator speedup, not an end-to-end training speedup.
+- **Reproducibility:** locked CPU dependencies, explicit RNG/backend settings,
+  separate evaluation environments, CSV metrics, model checkpoints, and source
+  provenance. The final model files contain parameters, not resumable optimizer state.
+- **Verification:** 16 correctness tests covering return arithmetic, GAE boundaries,
+  probability gradients, value regression, rollout budgets, inference equivalence,
+  and simulator equivalence; local logging and automated GitHub checks.
+
+[Algorithm notes](docs/ALGORITHMS.md) · [Source and protocol](docs/PROVENANCE.md)
+· [Runtime benchmark](docs/lunar_runtime.json) · [Training equivalence](docs/lunar_prefix_equivalence.json)
 
 ## Quick start
 
-Tested on Linux x86_64 with Python 3.10 and [uv](https://docs.astral.sh/uv/).
+Tested on Linux x86_64 with Python 3.10, [uv](https://docs.astral.sh/uv/),
+and a C/C++ compiler for Box2D. The build configuration supplies SWIG; PyTorch uses
+CPU wheels. Training requires no cloud account or API key.
 
 ```bash
-uv sync
-uv run pytest
-uv run src/scripts/run.py --env_name CartPole-v0 -n 100 -b 1000 \
-  -rtg -na --exp_name cartpole_rtg_na --no_gpu
+uv sync --locked
+uv run pytest -q
+OPENBLAS_NUM_THREADS=1 uv run src/scripts/run.py --env_name CartPole-v0 \
+  -n 100 -b 1000 -rtg -na --exp_name cartpole_rtg_na \
+  --no_gpu --rollout_backend numpy
 ```
 
-The lockfile uses CPU PyTorch. MuJoCo and Box2D install through `uv`; the build
-configuration supplies SWIG for Box2D automatically. No API key is needed.
-
-## Experiments
-
-| Study | Environment | Question |
-|---|---|---|
-| Return estimator ablation | CartPole-v0 | How do reward-to-go, normalization, and batch size affect learning? |
-| Value baseline | HalfCheetah-v4 | Does learning a baseline improve continuous control? |
-| Bias–variance tradeoff | LunarLander-v2 | How does GAE λ affect policy performance? |
-| Sample efficiency | InvertedPendulum-v4 | Can tuning reach return 1,000 within 100,000 training transitions? |
-
-All eight CartPole ablations are complete; HalfCheetah, LunarLander, and
-InvertedPendulum experiments are in progress. [Measured results and discussion](docs/RESULTS.md)
-show peak, final, and trailing-ten mean returns, with links to raw CSVs.
-
-![CartPole return-estimator comparison](media/cartpole_small.png)
-
-[Large-batch comparison](media/cartpole_large.png)
+Run or resume the experiment matrix, regenerate analysis, and build the assignment archive:
 
 ```bash
-# Full assignment matrix, with one BLAS thread per process and explicit CPU inference
 uv run python scripts/experiments.py --workers 4 --notify
 uv run python scripts/status.py
 uv run python scripts/analyze.py
 uv run python scripts/package_submission.py
 ```
 
-See [exact experiment commands](docs/commands.sh), [algorithm notes](docs/ALGORITHMS.md),
-and the [development guide](docs/DEVELOPMENT.md).
+The runner skips completed configurations, prevents duplicate jobs, and adopts
+matching live processes after an orchestrator restart. The archive contains code,
+logs, checkpoints, evaluation evidence, and the PDF report; videos live in `media/`.
+See the [development guide](docs/DEVELOPMENT.md) for rendering and operational details.
 
-## Repository
+## Repository map
 
 ```text
-src/agents/pg_agent.py      Return estimators, advantage calculation, actor/critic updates
-src/networks/              Categorical/Gaussian policies and value regression
-src/infrastructure/        Rollouts, PyTorch helpers, logging, private notifications
-src/scripts/run.py         Assignment-compatible training CLI
-scripts/                   Experiment orchestration, plots, media and packaging
-exp/                       Reproducible logs, flags and trained checkpoints
-media/                     Generated learning curves and policy demonstrations
-tests/                     Numerical and rollout correctness checks
-docs/                      Protocol, results and source attribution
+src/agents/pg_agent.py       Return estimators, advantages, actor/critic updates
+src/networks/               Categorical/Gaussian policies and value regression
+src/infrastructure/         Rollouts, simulator compatibility, logging, notifications
+src/scripts/run.py          Assignment-compatible training CLI
+scripts/                    Experiment orchestration, evaluation, plots, media, packaging
+exp/                        Versioned metrics, flags, provenance and model parameters
+media/                      Learning curves, GIF previews and full policy videos
+tests/                      Numerical and simulator regression checks
+docs/                       Results, PDF report, algorithms and reproduction protocol
 ```
-
-Each completed run saves `agent.pt`, `flags.json`, `log.csv`, `log.pkl`, and
-`provenance.json`. Plot x-axes count actual training transitions, excluding
-evaluation. See [source attribution and protocol](docs/PROVENANCE.md) for estimator,
-evaluation, time-limit, and dependency details.
 
 ## Optional integrations
 
-For W&B, run `uv sync --extra tracking`, then pass `--wandb_mode online` (or
-`offline`) to training. The default is local-only logging.
+For Discord, set `DISCORD_WEBHOOK_URL` in the ignored `.env` file using
+[.env.example](.env.example). `--notify` posts run summaries and exported media.
+Credentials are excluded from Git and submission archives.
 
-For Discord, copy `.env.example` to `.env`, set `DISCORD_WEBHOOK_URL`, and use:
-
-```bash
-uv run python -m infrastructure.notify "Experiment milestone" --attach media/cartpole_small.png
-```
-
-Credentials stay in the ignored `.env` file. Training artifacts and exported
-media contain no webhook credentials.
+For Weights & Biases, install `uv sync --extra tracking` and pass
+`--wandb_mode online` or `offline`. Local-only logging is the default.
 
 ## Attribution
 
-Based on [Berkeley Deep RL's Spring 2026 HW2 starter](https://github.com/berkeleydeeprlcourse/homework_spring2026/tree/main/hw2).
-This repository documents its additions and experimental assumptions in
-[PROVENANCE.md](docs/PROVENANCE.md).
+Extends the [official Berkeley Spring 2026 HW2 starter](https://github.com/berkeleydeeprlcourse/homework_spring2026/tree/main/hw2).
+The original file structure is preserved; this repository completes the learning
+implementations and adds experiment automation, performance engineering,
+validation, reporting, and media export. See [PROVENANCE.md](docs/PROVENANCE.md).

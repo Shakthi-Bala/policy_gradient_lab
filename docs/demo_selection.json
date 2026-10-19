@@ -1,0 +1,17 @@
+{
+  "purpose": "Illustrative successful demo selection; benchmark evaluation results are unchanged.",
+  "run": "exp/LunarLander-v2_lunar_lander_lambda0.99_sd1_20261019_171212",
+  "held_out_mean_return": 120.0,
+  "original_seed42_return": -24.72395906053724,
+  "candidate_returns": [
+    {
+      "seed": 0,
+      "return": 265.75199473745874,
+      "steps": 253
+    }
+  ],
+  "selected_seed": 0,
+  "rendered_example_return": 253.24070467107913,
+  "rendered_example_steps": 258,
+  "note": "Candidate screening and rendering are separate executions; both actual returns are recorded. Benchmark evaluations are unchanged."
+}

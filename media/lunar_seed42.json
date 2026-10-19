@@ -1,0 +1,19 @@
+{
+  "run": "exp/LunarLander-v2_lunar_lander_lambda0.99_sd1_20261019_171212",
+  "seed": 42,
+  "steps": 283,
+  "return": -24.72395906053724,
+  "checkpoint": "final",
+  "stochastic": true,
+  "fps": 50,
+  "command": [
+    "uv",
+    "run",
+    "python",
+    "scripts/render_policy.py",
+    "exp/LunarLander-v2_lunar_lander_lambda0.99_sd1_20261019_171212",
+    "--output",
+    "media/lunar_demo",
+    "--notify"
+  ]
+}

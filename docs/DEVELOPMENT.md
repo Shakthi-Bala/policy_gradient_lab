@@ -76,3 +76,8 @@ notification code. The experiment runner posts one summary per completed or fail
 run when `--notify` is present; rendering posts the corresponding media. Missing
 credentials or failed delivery do not invalidate training results. Notification
 exceptions print only exception classes to avoid exposing URLs in logs.
+
+GIF exports default to a 12-second preview; MP4s retain the full episode. Use
+`--gif_seconds` to change preview duration. Large original GIFs are retained locally
+in ignored `artifacts/media_full/`. The assignment archive excludes media assets
+but includes nested JSON evaluation evidence and the self-contained PDF report.

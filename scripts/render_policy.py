@@ -66,7 +66,15 @@ def main():
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--max_steps", type=int, default=1000)
     parser.add_argument("--notify", action="store_true")
+    parser.add_argument(
+        "--gif_seconds",
+        type=float,
+        default=12,
+        help="Maximum GIF preview duration; MP4 keeps the full episode",
+    )
     args = parser.parse_args()
+    if args.gif_seconds <= 0:
+        parser.error("gif_seconds must be positive")
     torch.set_num_threads(1)
     torch.manual_seed(args.seed)
     np.random.seed(args.seed)
@@ -118,10 +126,11 @@ def main():
     gif = args.output.with_suffix(".gif")
     imageio.mimsave(mp4, frames, fps=fps, macro_block_size=1)
     # GIF downsampling preserves playback speed and keeps Git/Discord artifacts small.
-    stride = max(1, round(fps / 15))
+    stride = max(1, round(fps / 12))
+    preview_frames = frames[: max(1, int(args.gif_seconds * fps))]
     gif_frames = [
         Image.fromarray(frame).resize((480, 360)).quantize(colors=96)
-        for frame in frames[::stride]
+        for frame in preview_frames[::stride]
     ]
     gif_frames[0].save(
         gif,
@@ -139,6 +148,7 @@ def main():
         "checkpoint": "final",
         "stochastic": True,
         "fps": fps,
+        "gif_preview_seconds": len(gif_frames) * stride / fps,
         "command": ["uv", "run", "python", "scripts/render_policy.py", *sys.argv[1:]],
     }
     args.output.with_suffix(".json").write_text(json.dumps(metadata, indent=2) + "\n")

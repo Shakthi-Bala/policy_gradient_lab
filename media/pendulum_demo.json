@@ -15,5 +15,7 @@
     "--output",
     "media/pendulum_demo",
     "--notify"
-  ]
+  ],
+  "gif_preview_seconds": 12.0,
+  "gif_preview_fps": 12.5
 }

@@ -15,12 +15,21 @@ All primary ablations use **seed 1**. Peak return is the best single evaluation 
 | [cartpole_rtg](../exp/CartPole-v0_cartpole_rtg_sd1_20261019_164922/log.csv) | 1 | 200.0 | 200.0 | 186.7 | 105,319 | 41,159 |
 | [cartpole](../exp/CartPole-v0_cartpole_sd1_20261019_164817/log.csv) | 1 | 200.0 | 122.0 | 126.3 | 104,024 | 20,711 |
 | [cheetah_baseline_bgs1](../exp/HalfCheetah-v4_cheetah_baseline_bgs1_sd1_20261019_170144/log.csv) | 1 | -54.8 | -54.8 | -154.3 | 500,000 | — |
+| [cheetah_baseline_na](../exp/HalfCheetah-v4_cheetah_baseline_na_sd1_20261019_172158/log.csv) | 1 | 610.4 | 370.9 | 503.3 | 500,000 | 385,000 |
 | [cheetah_baseline](../exp/HalfCheetah-v4_cheetah_baseline_sd1_20261019_170143/log.csv) | 1 | 389.2 | 104.9 | 127.0 | 500,000 | 435,000 |
+| [cheetah_baseline](../exp/HalfCheetah-v4_cheetah_baseline_sd2_20261019_171650/log.csv) | 2 | 263.8 | 208.1 | 208.2 | 500,000 | — |
+| [cheetah_baseline](../exp/HalfCheetah-v4_cheetah_baseline_sd3_20261019_171650/log.csv) | 3 | 99.0 | -60.6 | -11.5 | 500,000 | — |
+| [cheetah_baseline_torch](../exp/HalfCheetah-v4_cheetah_baseline_torch_sd1_20261019_173442/log.csv) | 1 | 386.6 | 374.2 | 324.3 | 500,000 | 475,000 |
 | [cheetah](../exp/HalfCheetah-v4_cheetah_sd1_20261019_170145/log.csv) | 1 | -204.9 | -231.2 | -235.2 | 500,000 | — |
 | [pendulum](../exp/InvertedPendulum-v4_pendulum_sd1_20261019_171447/log.csv) | 1 | 1000.0 | 6.3 | 71.7 | 509,717 | 431,837 |
 | [pendulum_tuned_fast](../exp/InvertedPendulum-v4_pendulum_tuned_fast_sd1_20261019_171751/log.csv) | 1 | 1000.0 | 142.9 | 138.9 | 108,688 | 26,939 |
 | [pendulum_tuned](../exp/InvertedPendulum-v4_pendulum_tuned_sd1_20261019_171455/log.csv) | 1 | 1000.0 | 222.4 | 372.7 | 106,469 | 40,028 |
 | [pendulum_tuned_small](../exp/InvertedPendulum-v4_pendulum_tuned_small_sd1_20261019_171505/log.csv) | 1 | 1000.0 | 1000.0 | 932.3 | 73,468 | 36,372 |
+| [lunar_lander_lambda0.95](../exp/LunarLander-v2_lunar_lander_lambda0.95_sd1_20261019_171212/log.csv) | 1 | 93.9 | -19.9 | -40.3 | 421,288 | — |
+| [lunar_lander_lambda0.98](../exp/LunarLander-v2_lunar_lander_lambda0.98_sd1_20261019_171212/log.csv) | 1 | 169.2 | 68.4 | 50.4 | 435,109 | 268,736 |
+| [lunar_lander_lambda0.99](../exp/LunarLander-v2_lunar_lander_lambda0.99_sd1_20261019_171212/log.csv) | 1 | 236.4 | 227.6 | 99.2 | 448,355 | 241,257 |
+| [lunar_lander_lambda0](../exp/LunarLander-v2_lunar_lander_lambda0_sd1_20261019_171212/log.csv) | 1 | 62.5 | -97.3 | -64.0 | 437,102 | — |
+| [lunar_lander_lambda1](../exp/LunarLander-v2_lunar_lander_lambda1_sd1_20261019_171212/log.csv) | 1 | 180.2 | 51.6 | 101.5 | 446,908 | 315,719 |
 
 Targets: CartPole 200; HalfCheetah 300; LunarLander 150; InvertedPendulum 1,000.
 
@@ -58,6 +67,26 @@ Normalization rescales the update and subtracts a batch mean; it is a useful heu
 
 Adding a baseline changed the last-ten evaluation mean from -235.2 to 127.0. Reducing its updates to one changed that mean to -154.3; final training-batch baseline MSE was 22.2 with five updates and 30.3 with one.
 
+### Baseline seed repeats
+
+The seed-1 baseline reached the peak target but missed the final-return target. Two additional seeds use exactly the same learning hyperparameters. All attempts are retained.
+
+Seed 1: peak 389.2, final 104.9, last-ten mean 127.0.
+
+Seed 2: peak 263.8, final 208.1, last-ten mean 208.2.
+
+Seed 3: peak 99.0, final -60.6, last-ten mean -11.5.
+
+### Optional advantage normalization
+
+The optional normalized-baseline run reached peak 610.4, final 370.9, and last-ten mean 503.3. It adds only advantage normalization to the seed-1 baseline configuration. This additional setting is reported separately from the prescribed unnormalized ablation.
+
+### Original-sampler reference
+
+A further seed-1 baseline trial uses the original PyTorch action sampler, with all learning hyperparameters unchanged: peak 386.6, final 374.2, last-ten mean 324.3. The NumPy and PyTorch backends have equivalent policy distributions but different seeded action streams; this diagnostic checks whether low final scores persist with the reference sampler. It is labeled separately from the three NumPy seed trials.
+
+**Unnormalized final-return target:** met in the recorded trials; best final evaluation 374.2 (cheetah_baseline_torch, seed 1). The normalized optional result is kept separate from this check.
+
 The one-gradient-step ablation keeps the baseline learning rate at 0.01 and reduces value updates from five to one. This slows fitting to the current batch; policy outcomes above show whether that change helped this seed. Value targets change with the policy, so training MSE need not decrease monotonically, and lower training MSE alone does not prove better control. The baseline uses raw targets.
 
 ![HalfCheetah return](../media/cheetah_returns.png)
@@ -65,6 +94,10 @@ The one-gradient-step ablation keeps the baseline learning rate at 0.01 and redu
 ![Baseline training loss](../media/cheetah_baseline_loss.png)
 
 ## 3. LunarLander: generalized advantage estimation
+
+Best peak: **lunar_lander_lambda0.99**, 236.4. Best trailing-ten mean: **lunar_lander_lambda1**, 101.5.
+
+At λ=0 the final evaluation was -97.3; at λ=1 it was 51.6. These endpoint measurements and the intermediate settings above describe how the chosen horizon affected this particular training seed. The comparison is descriptive; each setting needs more training seeds for a reliable ranking.
 
 λ=0 uses one-step TD residuals, reducing variance while depending heavily on value accuracy. λ=1 telescopes to Monte Carlo reward-to-go minus the baseline under the zero-tail boundary convention, reducing bootstrap bias while increasing variance. Intermediate λ mixes horizons. The observed ranking above and curves below reflect this seed, not a universal monotonic relationship. All five runs retain the PDF’s fixed batch size, learning rate, architecture, discount, and iteration budget.
 
@@ -101,7 +134,7 @@ Tuning reduces batches from 5,000 to 500 or 1,000 transitions to allow more freq
 
 ## Reproduction and limitations
 
-Exact command lines are in [commands.sh](commands.sh); per-run flags and source revision are beside each CSV. The eight CartPole, three HalfCheetah, five LunarLander, and four InvertedPendulum configurations, plus two additional HalfCheetah baseline seeds and the optional normalized-baseline run, are generated by `scripts/experiments.py`.
+Exact command lines are in [commands.sh](commands.sh); per-run flags and source revision are beside each CSV. The eight CartPole, three HalfCheetah, five LunarLander, and four InvertedPendulum configurations, plus two additional HalfCheetah baseline seeds the optional normalized-baseline run, and a reference PyTorch-sampler baseline, are generated by `scripts/experiments.py`.
 
 Single-seed comparisons and peak selection can be optimistic. A larger study should repeat every setting over independent seeds and evaluate saved policies over many held-out episodes. Training steps exclude evaluation interactions as required by the assignment. Time-limit tails are zero, not bootstrapped. Videos show individual rollouts of final checkpoints and do not establish average performance.
 
@@ -112,5 +145,12 @@ Configurations are selected from the benchmark comparisons. Each frozen final po
 | Selected policy | Episodes | Mean return | Standard deviation | Bootstrap 95% CI |
 |---|---:|---:|---:|---| 
 | [cartpole_na](evaluation/cartpole.json) | 30 | 200.0 | 0.0 | [200.0, 200.0] |
+| [cheetah_baseline_na](evaluation/cheetah.json) | 30 | 354.5 | 71.8 | [329.2, 379.9] |
+| [cheetah_baseline_torch](evaluation/cheetah_reference.json) | 30 | 409.0 | 55.9 | [388.4, 428.3] |
 | [cheetah_baseline](evaluation/cheetah_seed1.json) | 30 | 96.1 | 111.4 | [52.3, 131.6] |
+| [lunar_lander_lambda0.99](evaluation/lunar.json) | 30 | 120.0 | 143.7 | [66.3, 167.4] |
 | [pendulum_tuned_small](evaluation/pendulum.json) | 30 | 949.8 | 199.2 | [871.1, 1000.0] |
+
+## Demonstration selection
+
+GIFs are short previews; MP4s retain full episodes. The LunarLander showcase is an explicitly selected successful example, not a representative average. The selection log records every candidate tried, and the original seed-42 failure video is retained. The fresh-episode table above includes all 30 benchmark outcomes independently of demo selection.
