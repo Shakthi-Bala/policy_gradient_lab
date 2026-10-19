@@ -1,0 +1,19 @@
+{
+  "run": "exp/InvertedPendulum-v4_pendulum_tuned_small_sd1_20261019_171505",
+  "seed": 42,
+  "steps": 1000,
+  "return": 1000.0,
+  "checkpoint": "final",
+  "stochastic": true,
+  "fps": 25,
+  "command": [
+    "uv",
+    "run",
+    "python",
+    "scripts/render_policy.py",
+    "exp/InvertedPendulum-v4_pendulum_tuned_small_sd1_20261019_171505",
+    "--output",
+    "media/pendulum_demo",
+    "--notify"
+  ]
+}
