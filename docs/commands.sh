@@ -20,3 +20,5 @@ uv run src/scripts/run.py --env_name InvertedPendulum-v4 -n 100 -b 5000 -eb 1000
 uv run src/scripts/run.py --env_name InvertedPendulum-v4 -n 100 -b 1000 -eb 1000 -rtg -na --discount 0.99 -lr 0.01 --use_baseline --gae_lambda 0.95 -bgs 10 --exp_name pendulum_tuned --no_gpu --rollout_backend numpy
 uv run src/scripts/run.py --env_name InvertedPendulum-v4 -n 100 -b 500 -eb 1000 -rtg -na --discount 0.99 -lr 0.005 --use_baseline --gae_lambda 0.98 -bgs 10 --exp_name pendulum_tuned_small --no_gpu --rollout_backend numpy
 uv run src/scripts/run.py --env_name InvertedPendulum-v4 -n 100 -b 1000 -eb 1000 -rtg -na --discount 0.99 -lr 0.02 --use_baseline --gae_lambda 0.95 -bgs 10 --exp_name pendulum_tuned_fast --no_gpu --rollout_backend numpy
+uv run src/scripts/run.py --env_name HalfCheetah-v4 -n 100 -b 5000 -eb 3000 -rtg --discount 0.95 -lr 0.01 --use_baseline -blr 0.01 -bgs 5 --exp_name cheetah_baseline --no_gpu --rollout_backend numpy --seed 2
+uv run src/scripts/run.py --env_name HalfCheetah-v4 -n 100 -b 5000 -eb 3000 -rtg --discount 0.95 -lr 0.01 --use_baseline -blr 0.01 -bgs 5 --exp_name cheetah_baseline --no_gpu --rollout_backend numpy --seed 3

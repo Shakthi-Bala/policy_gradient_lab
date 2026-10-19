@@ -140,11 +140,21 @@ def experiments():
             "--rollout_backend",
             "numpy",
         ]
+    baseline = next(job for job in jobs if job["name"] == "cheetah_baseline")
+    for seed in (2, 3):
+        jobs.append(
+            {
+                "group": "cheetah",
+                "name": "cheetah_baseline",
+                "seed": seed,
+                "args": [*baseline["args"], "--seed", str(seed)],
+            }
+        )
     return jobs
 
 
 def completed_directory(job):
-    prefix = f"{job['args'][1]}_{job['name']}_sd1_"
+    prefix = f"{job['args'][1]}_{job['name']}_sd{job.get('seed', 1)}_"
     for directory in sorted((ROOT / "exp").glob(prefix + "*"), reverse=True):
         flags_file = directory / "flags.json"
         if not flags_file.exists() or not (directory / "log.csv").exists():
@@ -178,7 +188,7 @@ def run_job(job, notify):
     # recheck completion so they never launch the same job twice.
     lock_dir = ROOT / "artifacts" / "locks"
     lock_dir.mkdir(parents=True, exist_ok=True)
-    with (lock_dir / f"{job['name']}.lock").open("a") as handle:
+    with (lock_dir / f"{job['name']}_sd{job.get('seed', 1)}.lock").open("a") as handle:
         fcntl.flock(handle, fcntl.LOCK_EX)
         return run_locked_job(job, notify)
 
@@ -212,7 +222,7 @@ def run_locked_job(job, notify):
                 break
             time.sleep(2)
     else:
-        with (log_dir / f"{name}.log").open("w") as handle:
+        with (log_dir / f"{name}_sd{job.get('seed', 1)}.log").open("w") as handle:
             result = subprocess.run(
                 [sys.executable, "src/scripts/run.py", *job["args"]],
                 check=False,
@@ -235,7 +245,7 @@ def run_locked_job(job, notify):
         message = (
             f"{name}: completed {len(rows)} iterations in {duration:.1f} min. "
             f"Eval return peak={peak:.1f}, final={final:.1f}; "
-            f"training steps={int(float(rows[-1]['Train_EnvstepsSoFar'])):,}. Seed 1."
+            f"training steps={int(float(rows[-1]['Train_EnvstepsSoFar'])):,}. Seed {job.get('seed', 1)}."
         )
     print(message, flush=True)
     if notify:

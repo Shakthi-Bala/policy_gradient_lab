@@ -33,8 +33,8 @@ def main():
         if directory.is_dir():
             flags = validate_run(directory)
             directories.append(directory)
-            names.add(flags["exp_name"])
-    missing = {job["name"] for job in experiments()} - names
+            names.add((flags["exp_name"], flags["seed"]))
+    missing = {(job["name"], job.get("seed", 1)) for job in experiments()} - names
     if missing:
         raise ValueError(
             f"Missing required experiment configurations: {sorted(missing)}"
